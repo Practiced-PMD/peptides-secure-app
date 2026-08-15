@@ -9,6 +9,16 @@ import crypto from 'node:crypto';
 const norm = (email) => String(email || '').trim().toLowerCase();
 export const normEmail = norm;
 
+// Grandfathered ("legacy") buyers — people who purchased on the old shared-code
+// system before this email-license app existed. Set the LEGACY_PAID_EMAILS env var
+// to a comma-separated list of their emails; they are treated as paid forever.
+const LEGACY_PAID = new Set(
+  String(process.env.LEGACY_PAID_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+);
+
 const licenses = () => getStore('licenses');
 const codes = () => getStore('codes');
 const devices = () => getStore('devices');
@@ -22,6 +32,7 @@ export async function getLicense(email) {
   return await licenses().get(norm(email), { type: 'json' });
 }
 export async function isPaidNow(email) {
+  if (LEGACY_PAID.has(norm(email))) return true;   // grandfathered founding buyers
   const lic = await getLicense(email);
   if (!lic || lic.status === 'canceled') return false;
   if (lic.paidThrough && Date.now() / 1000 > lic.paidThrough) return false;
