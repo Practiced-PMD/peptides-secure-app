@@ -1,0 +1,10 @@
+{
+  "name": "peptides-practiced-secure",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Secure, email-license-gated build of Peptides, Practiced. (Netlify Functions).",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

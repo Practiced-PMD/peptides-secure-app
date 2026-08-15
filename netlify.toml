@@ -1,0 +1,12 @@
+# Netlify config for Peptides, Practiced. (secure email-license build)
+[build]
+  publish = "public"                 # only the free preview (Volume 01 + teasers) is served publicly
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  # bundle the private content (sections.json) + any PDFs WITH the functions,
+  # so paid volumes are NEVER part of the public site.
+  included_files = ["netlify/functions/_protected/**"]
+
+# friendly /api/* paths are declared per-function via `export const config = { path }`
