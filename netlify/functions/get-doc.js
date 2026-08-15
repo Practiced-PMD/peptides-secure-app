@@ -1,6 +1,6 @@
-// get-doc.js — streams one protected file, only to a licensed, active device.
-// Put protected PDFs in _protected/docs/<id>.pdf and list their ids below.
-// If your app has no protected PDFs, leave DOCS empty.
+// get-doc.js — streams one protected file, but only to a licensed, active device.
+// Files live under netlify/functions/_protected/ and are bundled with the function
+// (see netlify.toml included_files), so they are NEVER served as public static assets.
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { verifyToken, bearer } from './_lib/token.js';
@@ -8,10 +8,13 @@ import { deviceAllowed } from './_lib/store.js';
 
 export const config = { path: '/api/get-doc' };
 
-// EDIT for your app: the allowed document ids (filenames without .pdf).
-const DOCS = [];
+// Protected downloads: id -> { file (relative to _protected/), type, filename }
+const DOCS = {
+  library: { file: 'library.zip', type: 'application/zip', filename: 'Peptides-Practiced-Library.zip' },
+};
 
-const deny = (msg, status) => new Response(JSON.stringify({ ok: false, message: msg }), { status, headers: { 'content-type': 'application/json' } });
+const deny = (msg, status) =>
+  new Response(JSON.stringify({ ok: false, message: msg }), { status, headers: { 'content-type': 'application/json' } });
 
 export default async (req) => {
   const url = new URL(req.url);
@@ -19,18 +22,20 @@ export default async (req) => {
   const token = bearer(req) || url.searchParams.get('t');
 
   const claim = verifyToken(token);
-  if (!claim) return deny('Not licensed.', 401);
-  if (!(await deviceAllowed(claim.email, claim.device))) return deny('This device is no longer active.', 403);
-  if (!id || !DOCS.includes(id)) return deny('Unknown document.', 404);
+  if (!claim) return deny('Not licensed. Please sign in.', 401);
+  if (!(await deviceAllowed(claim.email, claim.device))) return deny('This device is no longer active on your license.', 403);
 
-  const p = fileURLToPath(new URL(`./_protected/docs/${id}.pdf`, import.meta.url));
+  const doc = id && DOCS[id];
+  if (!doc) return deny('Unknown document.', 404);
+
+  const p = fileURLToPath(new URL(`./_protected/${doc.file}`, import.meta.url));
   let bytes;
   try { bytes = await readFile(p); } catch { return deny('Document not found.', 404); }
 
   return new Response(bytes, {
     headers: {
-      'content-type': 'application/pdf',
-      'content-disposition': `inline; filename="${id}.pdf"`,
+      'content-type': doc.type,
+      'content-disposition': `attachment; filename="${doc.filename}"`,
       'cache-control': 'private, no-store',
     },
   });
