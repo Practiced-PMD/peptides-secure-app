@@ -423,7 +423,7 @@ function renderHome(){
     + '</div></div>';
   if(!isLicensed()){
     html += '<div class="unlock-bar"><div class="ub-txt"><strong>Preview mode.</strong> Volume 1 and the Dose Calculator are open. Sign in with the email you purchased with to unlock the full library on this device.</div>'
-      + '<button onclick="showSignin(\'home\')">Sign in</button></div>';
+      + '<button onclick="showSignin(\'home\')">Sign in</button> <a href="https://buy.stripe.com/aFa4gz65Q9Ry0s0a3SfIs02" style="display:inline-block;background:var(--teal);color:#fff;padding:9px 15px;border-radius:8px;text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap">Get the library &rarr;</a></div>';
   }
   GROUPS.forEach(g=>{
     const items = DATA.filter(d=>d.kind===g.kind);
@@ -496,6 +496,7 @@ function renderDoc(code){
     + '<h2>'+d.title+'</h2>'
     + '<p>This is part of the full library. Sign in with the email you purchased with to unlock all volumes, protocols, and references on this device.</p>'
     + '<button class="signin" onclick="showSignin(\''+code+'\')">Sign in to unlock</button>'
+    + '<div style="margin-top:14px;font-size:13.5px;color:var(--muted)">New here? <a href="https://buy.stripe.com/aFa4gz65Q9Ry0s0a3SfIs02" style="color:var(--teal);font-weight:700;text-decoration:none">Get the full library &rarr;</a> then sign in with that email.</div>'
     + '<p style="margin-top:18px;font-size:13px">Free preview available: <a href="#" onclick="showDoc(\'01\');return false;">Volume 1 — Mitochondrial</a> and the <a href="#" onclick="showCalc();return false;">Dose Calculator</a>.</p>'
     + '</div>';
   window.scrollTo(0,0);
@@ -560,7 +561,7 @@ function renderSignin(returnTo){
     +   '<div class="si-note">We emailed a code to <b id="siEmailEcho"></b>. <a href="#" onclick="siReset();return false;">Use a different email</a></div>'
     + '</div>'
     + '<div class="si-msg" id="siMsg"></div>'
-    + '<div class="si-note">Don\'t have access yet? Purchase, then sign in with that same email. Trouble? Contact <a href="mailto:support@practiced.health">support@practiced.health</a>.</div>'
+    + '<div class="si-note" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">Don\'t have access yet? <a href="https://buy.stripe.com/aFa4gz65Q9Ry0s0a3SfIs02" style="color:var(--teal);font-weight:700;text-decoration:none">Get the full library &rarr;</a> then sign in with that same email. Trouble? Contact <a href="mailto:support@practiced.health">support@practiced.health</a>.</div>'
     + '</div>';
   document.querySelector('nav').classList.remove('open');
   window.scrollTo(0,0);
