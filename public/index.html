@@ -615,7 +615,7 @@ function syncLicArea(){
   if(!host) return;
   if(isLicensed()){
     const em=(LIC.email()||'').replace(/[<>&]/g,'');
-    host.innerHTML='<span class="lic-badge" title="Your license">🔓 Licensed to <b>'+em+'</b></span><a class="lic-out" id="licOut">Sign out</a>';
+    host.innerHTML='<span class="lic-badge" title="Your license">🔓 Licensed to <b>'+em+'</b></span> <a href="download.html" style="color:var(--teal);font-weight:600;text-decoration:none;margin:0 6px;white-space:nowrap" title="Download the full library as a PDF pack">⬇ Download library</a> <a class="lic-out" id="licOut">Sign out</a>';
     const out=document.getElementById('licOut');
     if(out) out.addEventListener('click',function(ev){ ev.preventDefault(); if(confirm('Sign out of the library on this device?')){ LIC.clear(); try{sessionStorage.clear();}catch(e){} location.reload(); } });
   } else {
