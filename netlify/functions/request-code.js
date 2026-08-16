@@ -1,7 +1,7 @@
 // request-code.js — user types their email; if it paid, email them a 6-digit code.
 // Always returns the same friendly message (don't reveal who has paid).
 import crypto from 'node:crypto';
-import { isPaidNow, putCode, normEmail } from './_lib/store.js';
+import { isPaidNow, isBuilderEntitled, putCode, normEmail } from './_lib/store.js';
 import { sendCodeEmail } from './_lib/email.js';
 
 export const config = { path: '/api/request-code' };
@@ -16,8 +16,9 @@ export default async (req) => {
   email = normEmail(email);
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ ok: false, message: 'Please enter a valid email.' }, 400);
 
-  // Only paid emails get a code. Unpaid → same message, no email sent.
-  if (await isPaidNow(email)) {
+  // Paid library members OR standalone Builder buyers get a code.
+  // (Builder-only buyers never bought the library but must still be able to sign in.)
+  if ((await isPaidNow(email)) || (await isBuilderEntitled(email))) {
     const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
     await putCode(email, code, 600);
     try { await sendCodeEmail(email, code); }

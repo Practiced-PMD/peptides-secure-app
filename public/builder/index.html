@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Compliance-Ready Peptide Program — Practiced.Health</title>
+<style>
+  :root{--navy:#1F3A5F;--navy2:#16293f;--teal:#2E7D8A;--mint:#8fe3d3;--amber:#BF8F00;
+    --bg:#eef2f2;--card:#fff;--ink:#232a31;--muted:#6b7783;--line:#e2e6e6;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --serif:'Fraunces',Georgia,serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--navy2),var(--teal));color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  header .brand{display:flex;align-items:center;gap:12px}
+  header .mk{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;font-size:22px}
+  header .t{font-family:var(--serif);font-size:19px;font-weight:600}
+  header .t small{display:block;font-family:var(--sans);font-size:11px;color:#cfe6e8;font-style:italic;font-weight:400}
+  header button{background:rgba(255,255,255,.15);color:#fff;border:none;font-weight:700;font-size:13px;padding:10px 16px;border-radius:9px;cursor:pointer}
+  .wrap{display:grid;grid-template-columns:360px 1fr;height:calc(100vh - 72px)}
+  .panel{background:#f7f9f9;border-right:1px solid var(--line);overflow-y:auto;padding:20px 20px 60px}
+  .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--teal);font-weight:800;margin:18px 0 8px}
+  .panel h2:first-child{margin-top:0}
+  .fld{margin-bottom:11px}
+  .fld label{display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:3px}
+  .fld input,.fld select{width:100%;padding:8px 10px;border:1px solid #cfd8d8;border-radius:8px;font-size:13px;font-family:var(--sans);background:#fff}
+  .hint{font-size:11px;color:var(--muted);margin-top:2px}
+  .pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:1px}
+  .pill.on{background:#e7f6f2;color:#1f6b5c}.pill.off{background:#f1f1f1;color:#888}
+  .preview{overflow-y:auto;padding:26px 30px 80px;background:#dfe4e4}
+  .doc{max-width:820px;margin:0 auto;background:#fff;box-shadow:0 6px 30px rgba(0,0,0,.1);padding:48px 54px;border-radius:6px}
+  .doc h1{font-family:var(--serif);font-size:26px;color:var(--navy);line-height:1.15;margin-bottom:4px}
+  .doc .subtitle{font-size:14px;color:var(--teal);font-weight:600}
+  .doc .brandline{font-size:12px;color:var(--muted);margin-bottom:18px}
+  .doc h2{font-family:var(--serif);font-size:18px;color:var(--navy);margin:26px 0 8px;padding-bottom:5px;border-bottom:2px solid #e7ecec}
+  .doc h3{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 5px}
+  .doc p{font-size:13.5px;margin-bottom:9px}
+  .doc .fillval{background:#fff7e0;border-bottom:1px solid #e6c766;padding:0 4px;font-weight:600;color:#5c4708}
+  .doc .blank{color:#b9bfbf}
+  .doc .disc{background:#fff7ef;border:1px solid #f0d9b8;border-left:4px solid var(--amber);padding:11px 14px;border-radius:8px;font-size:12.5px;color:#5c4708;margin:14px 0}
+  .doc .statebox{background:#eef6f9;border:1px solid #cfe3ea;border-left:4px solid var(--teal);padding:11px 14px;border-radius:8px;font-size:12.5px;margin:12px 0}
+  .doc .ck{color:var(--teal);font-weight:700}
+  /* lock */
+  .lock{position:fixed;inset:0;z-index:50;background:linear-gradient(150deg,#16293f,#1F3A5F 55%,#2E7D8A);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px}
+  .lock .card{max-width:520px;text-align:center}
+  .lock .ic{font-size:44px;margin-bottom:14px}
+  .lock h1{font-family:var(--serif);font-size:32px;font-weight:600;margin-bottom:10px}
+  .lock h1 .d{color:var(--mint)}
+  .lock p{font-size:15.5px;color:#e7f1f3;margin-bottom:10px;line-height:1.55}
+  .lock .feats{text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px 18px;margin:18px 0;font-size:14px}
+  .lock .feats li{margin:5px 0 5px 6px;list-style:none;display:flex;gap:9px;align-items:flex-start}
+  .lock .feats li:before{content:"✓";color:var(--mint);font-weight:800}
+  .lock .email{width:100%;padding:12px 14px;border-radius:10px;border:none;font-size:15px;margin:6px 0 10px}
+  .lock .btn{display:inline-block;background:var(--amber);color:#1a1400;font-weight:800;font-size:16px;padding:14px 30px;border-radius:11px;border:none;cursor:pointer;text-decoration:none}
+  .lock .signin{margin-top:14px;font-size:13.5px;color:#cfe6e8}
+  .lock .signin a{color:#fff;font-weight:600;cursor:pointer}
+  .lock .price{font-size:13px;color:#bcd7dc;margin-top:12px}
+  .lock .msg{font-size:12.5px;color:#ffd9d9;margin-top:10px;min-height:16px}
+  @media print{
+    .lock,header,.panel{display:none !important}
+    .wrap{display:block;height:auto}.preview{overflow:visible;padding:0;background:#fff}
+    .doc{box-shadow:none;max-width:none;padding:0;border-radius:0}
+    .doc h2{page-break-after:avoid}
+  }
+</style></head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div class="lock" id="lock">
+  <div class="card">
+    <div class="ic">🔒</div>
+    <h1>Compliance-Ready Peptide Program<span class="d">.</span></h1>
+    <p>The <b>state-specific compliance documents</b> you need to add peptides to your
+    practice — intake, consent, patient scripts, monitoring, and documentation —
+    generated and branded for your clinic in minutes.</p>
+    <ul class="feats">
+      <li>Your clinic + provider details auto-filled throughout</li>
+      <li>State-specific regulatory &amp; consent language for your state</li>
+      <li>NP/PA vs. physician logic handled automatically</li>
+      <li>Print or save each form as a fillable PDF</li>
+    </ul>
+    <input class="email" id="lockEmail" placeholder="Email you purchased with">
+    <a class="btn" id="unlockBtn" href="#">Unlock Access →</a>
+    <div class="price">One-time · <b id="lockPrice">$797</b></div>
+    <div class="msg" id="lockMsg"></div>
+    <div class="signin">Already purchased? <a id="signinLink">Sign in</a></div>
+    <div style="margin-top:16px;font-size:12px;color:#9fbcc4">By purchasing you agree to our <a href="/terms" target="_blank" style="color:#cfe6e8;text-decoration:underline">Terms of Service</a>.</div>
+  </div>
+</div>
+
+<header>
+  <div class="brand"><div class="mk">P</div>
+    <div class="t">Compliance-Ready Peptide Program<small>Practiced.Health · state-specific compliance documents for your practice</small></div></div>
+  <button onclick="window.print()">🖨 Print / Save PDF</button>
+</header>
+<div class="wrap">
+  <div class="panel">
+    <h2>Practice</h2>
+    <div class="fld"><label>Clinic / practice name</label><input id="clinic" placeholder="Your clinic name"></div>
+    <div class="fld"><label>Address</label><input id="address" placeholder="Street, City, ST ZIP"></div>
+    <div class="fld"><label>Phone</label><input id="phone" placeholder="(xxx) xxx-xxxx"></div>
+    <div class="fld"><label>Email / website</label><input id="email" placeholder="clinic@example.com"></div>
+    <h2>Provider</h2>
+    <div class="fld"><label>Provider name</label><input id="provider" placeholder="Full name"></div>
+    <div class="fld"><label>Credentials</label><input id="creds" placeholder="e.g., APRN, FNP-C"></div>
+    <div class="fld"><label>License type <span id="s7pill" class="pill off">Section 7 off</span></label>
+      <select id="license" onchange="render()">
+        <option value="NP">Nurse Practitioner (APRN)</option>
+        <option value="PA">Physician Assistant (PA)</option>
+        <option value="MD">Physician (MD)</option>
+        <option value="DO">Physician (DO)</option>
+      </select>
+      <div class="hint">NP/PA → state regulatory section included. MD/DO → omitted.</div></div>
+    <div class="fld"><label>Practice model</label>
+      <select id="model"><option>Independent</option><option>Collaborative / supervised</option><option>Group practice</option></select></div>
+    <h2>State &amp; tier</h2>
+    <div class="fld"><label>State of practice</label>
+      <select id="state" onchange="render()"></select>
+      <div class="hint">Built states load their specific wording; others use the general note until built.</div></div>
+    <div class="fld"><label>Program fees (optional)</label><input id="fees" placeholder="e.g., $X / month"></div>
+    <div class="hint" style="margin-top:14px">Fill any field — the packet updates live. Then Print / Save PDF.</div>
+  </div>
+  <div class="preview"><div class="doc" id="doc"></div></div>
+</div>
+
+<script>
+// ---------- CONFIG ----------
+const PRICE_ADDON = '$397';         // existing library member add-on
+const PRICE_STANDALONE = '$797';    // standalone buyer (never bought the library)
+const UNLOCK_URL_ADDON = 'https://buy.stripe.com/4gMdR9gKue7OgqY5NCfIs04?client_reference_id=builder';       // $397 add-on
+const UNLOCK_URL_STANDALONE = 'https://buy.stripe.com/14A9AT3XI1l2caIa3SfIs03?client_reference_id=builder'; // $797 standalone
+const STATE_RESEARCHED_AS_OF = 'August 2026';   // update when states are re-reviewed
+
+// ---------- STATES ----------
+const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+
+const GENERAL = {
+  consentCompliance: `<div class="statebox"><b>‹State content — not yet built for this state›</b> This general CAM consent (national FSMB model) applies. Confirm your state's informed-consent/CAM requirements with your own counsel.</div>`,
+  section7: null
+};
+
+const STATES_BUILT = {
+  "Louisiana": {
+    consentCompliance: `<div class="statebox"><b>Louisiana:</b> Louisiana has no Texas-style dedicated CAM-consent rule. This general CAM consent (national FSMB model) applies, layered with Louisiana's ordinary informed-consent law. <i>Verify current requirements with your own Louisiana counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Louisiana is a <b>reduced/restricted-practice</b> state: an APRN cannot practice or prescribe independently and works under a Collaborative Practice Agreement (CPA) with a physician. This packet does not set up your CPA — an established practice already has one.</p>
+      <p><i>Confirm your existing collaborative agreement's approved drug categories already cover the peptide classes you'll prescribe.</i> (Pending bill LA H 495 would grant full practice authority — not law; do not rely on it.)</p>
+      <h3>7.2 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> obtained from another lawful professional-use/investigational source (e.g., Thymalin). Do not assume a compounding pharmacy is the only channel; confirm each agent's current legal availability.</p>
+      <h3>7.3 — Telehealth (if used)</h3>
+      <p>Louisiana's rules for establishing the provider-patient relationship and any exam requirement before prescribing apply. <i>Verify current Louisiana telehealth-prescribing rules with counsel.</i></p>`
+  },
+  "Texas": {
+    consentCompliance: `<div class="statebox"><b>Texas compliance statement:</b> This form complies with the disclosure requirements in Texas Administrative Code, Title 22, Part 9, Chapter 171, §171.2 (Complementary and Alternative Medicine). The treating provider has made the required disclosures, discussed conventional and nonconventional options, and documented consent in the medical record. <i>Verify current requirements with your own Texas counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Texas APRNs prescribe under a <b>prescriptive authority agreement</b> with a delegating physician. This packet does not set that up — an established practice already has one. <i>Confirm your agreement's authorized drug categories cover the peptide classes you'll prescribe.</i></p>
+      <h3>7.2 — Consent</h3>
+      <p>Texas requires the CAM disclosure/consent under 22 TAC §171.2 (built into the consent above). Keep the signed form in the record.</p>
+      <h3>7.3 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability.</p>`
+  }
+};
+
+function stateData(name){ return STATES_BUILT[name] || GENERAL; }
+
+// populate dropdown
+(function(){
+  const sel = document.getElementById('state');
+  sel.innerHTML = US_STATES.map(s => `<option value="${s}">${s}${STATES_BUILT[s]?'':'  (general)'}</option>`).join('');
+  sel.value = 'Louisiana';
+})();
+
+function v(id){ return document.getElementById(id).value.trim(); }
+function fill(val, ph){ return val ? `<span class="fillval">${val}</span>` : `<span class="blank">[${ph}]</span>`; }
+
+function render(){
+  const st = stateData(v('state'));
+  const lic = v('license');
+  const mid = (lic === 'NP' || lic === 'PA');
+  const pill = document.getElementById('s7pill');
+  pill.className = 'pill ' + (mid ? 'on' : 'off');
+  pill.textContent = mid ? 'Section 7 on' : 'Section 7 off';
+
+  const clinic = fill(v('clinic'),'Clinic name');
+  const prov = fill(v('provider'),'Provider name');
+  const creds = v('creds') ? `<span class="fillval">${v('creds')}</span>` : `<span class="blank">[credentials]</span>`;
+  const addr = fill(v('address'),'Address');
+  const phone = fill(v('phone'),'Phone');
+  const fees = fill(v('fees'),'your program fees');
+
+  let s7 = '';
+  if (mid){
+    if (st.section7){
+      s7 = `<h2>Section 7 — State Regulatory Overlay (${v('state')})</h2>
+        <div class="disc">Applies to APRNs/PAs. State content researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and believed current. Regulations change — <b>always confirm with your state medical/nursing board and your own medico-legal counsel before use.</b></div>
+        ${st.section7}
+        <h3>7.x — National caveat</h3>
+        <p>The FDA/compounding status of specific peptides is federal, changes over time, and applies in every state. Confirm each peptide's current availability before building it into the program.</p>`;
+    } else {
+      s7 = `<h2>Section 7 — State Regulatory Overlay</h2>
+        <div class="statebox"><b>${v('state')} — state specifics not yet built.</b> Your state's practice-authority, consent, sourcing, and telehealth rules should be confirmed with your own counsel. (Practiced.Health is adding states on an ongoing basis.)</div>`;
+    }
+  } else {
+    s7 = `<h2>Section 7 — State Regulatory Overlay</h2>
+      <div class="statebox">Not applicable — this section applies only to APRNs and PAs. As a physician (${lic}), your packet omits it.</div>`;
+  }
+
+  document.getElementById('doc').innerHTML = `
+    <div class="subtitle">COMPLIANCE-READY PEPTIDE PROGRAM · STATE-SPECIFIC</div>
+    <h1>Clinical program tools for ${clinic}</h1>
+    <div class="brandline">A Practiced.Health resource for licensed practitioners · Provider: ${prov}, ${creds} · ${addr} · ${phone}</div>
+    <div class="disc"><b>Not legal advice.</b> Educational/operational template. Have this reviewed by your own medico-legal counsel before clinical use.</div>
+
+    <h2>Section 1 — Provider Program Workflow</h2>
+    <p><b>1. Screen &amp; qualify</b> — patient completes Intake (Sec. 2); review the safety screen first (malignancy hard-stop for angiogenic/GH peptides; pregnancy; reactivity).</p>
+    <p><b>2. Consult &amp; consent</b> — discuss goals/mechanism/evidence tier; patient signs consent (Sec. 3) before the first prescription.</p>
+    <p><b>3. Baseline labs</b> — panel matched to the peptide class (Sec. 5). No angiogenic/GH peptide without malignancy screen addressed.</p>
+    <p><b>4. Prescribe &amp; obtain agent</b> — compounded or other lawful professional-use/investigational source; document agent, source, lot.</p>
+    <p><b>5. Teach administration</b> — reconstitution, technique, storage, fasting rules (GH secretagogues ≥2-hr fast).</p>
+    <p><b>6. Follow up &amp; monitor</b> — per Sec. 5; document every visit (Sec. 6).</p>
+    <p><b>7. Cycle, adjust, or stop</b> — titrate by response, not calendar; hold at lowest effective dose; peptide holidays where indicated.</p>
+
+    <h2>Section 2 — Patient Intake &amp; Safety Screen</h2>
+    <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds}</p>
+    <p><b>Goals:</b> _______  <b>Tried already:</b> _______</p>
+    <p><b>Medical history (check):</b> <span class="ck">☐</span> Cancer/malignancy <b>(safety-critical)</b> · <span class="ck">☐</span> Pregnant/TTC <b>(safety-critical)</b> · <span class="ck">☐</span> Active infection · <span class="ck">☐</span> Autoimmune · <span class="ck">☐</span> CVD · <span class="ck">☐</span> Diabetes/IR · <span class="ck">☐</span> Thyroid · <span class="ck">☐</span> Kidney/liver · <span class="ck">☐</span> Mold/CIRS · <span class="ck">☐</span> Tick-borne · <span class="ck">☐</span> Mental health</p>
+    <p><b>Meds/supplements/prior peptides:</b> _______ &nbsp; <b>Allergies:</b> _______</p>
+    <p><b>Overall reactivity:</b> tolerates most / moderately sensitive / reacts to everything <b>(drives dosing)</b></p>
+    <p><b>Provider safety screen:</b> <span class="ck">☐</span> malignancy addressed before angiogenic/GH peptide · <span class="ck">☐</span> pregnancy confirmed · <span class="ck">☐</span> start-low plan if sensitive · <span class="ck">☐</span> mold/CIRS status noted</p>
+
+    <h2>Section 3 — Informed Consent (CAM / Peptide Therapy)</h2>
+    <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds}</p>
+    <p><b>Collaborating/Supervising Physician (only if required in your state):</b> <span class="blank">[name or N/A]</span></p>
+    <p>This consent covers the treatment plan, testing, potential benefits, and risks of the peptide/CAM treatment offered. Read carefully; ask questions; you may withdraw consent at any time. Some agents are compounded or investigational and not FDA-approved for this use.</p>
+    ${st.consentCompliance}
+    <h3>Peptide Therapy Benefits Menu (check goals discussed — potential goals, not guarantees)</h3>
+    <p><span class="ck">☐</span> Tissue repair &amp; recovery · <span class="ck">☐</span> Gut &amp; GI barrier · <span class="ck">☐</span> Immune support · <span class="ck">☐</span> Metabolic &amp; weight · <span class="ck">☐</span> Energy &amp; mitochondrial · <span class="ck">☐</span> Cognitive &amp; mood · <span class="ck">☐</span> Sleep · <span class="ck">☐</span> Skin, hair &amp; aesthetic · <span class="ck">☐</span> Sexual health &amp; libido · <span class="ck">☐</span> Longevity &amp; healthy aging</p>
+    <h3>Required disclosure &amp; acknowledgment (initial each)</h3>
+    <p>Assessment (conventional/nonconventional diagnosis described; hx &amp; exam done; conventional options discussed; prior tx obtained; interference assessed). Disclosure (objectives; risks/benefits; interference; plain-language mechanism; FDA/DSHEA/investigational status; individualized plan; favorable risk-benefit; reasonable expectation of benefit; periodic review).</p>
+    <p><span class="ck">☐</span> I have read this and had questions answered · <span class="ck">☐</span> I understand it may be non-FDA-approved/investigational · <span class="ck">☐</span> No result guaranteed; consent voluntary &amp; revocable</p>
+    <p>Patient: _______ Signature: _______ Date: ___ &nbsp;|&nbsp; Provider: _______ Date: ___</p>
+
+    <h2>Section 4 — Patient Conversation Script + FAQ</h2>
+    <p><b>Goals first:</b> "Let's start with what you're hoping to feel or fix — peptides work best aimed at a goal, not as a general tonic."</p>
+    <p><b>What they are · Evidence honesty · Safety · What to expect</b> — <i>(in the app, each line expands to the provider explanation drawn from the Practiced.Health peptide library.)</i></p>
+    <p><b>Cost FAQ answer:</b> ${fees}</p>
+
+    <h2>Section 5 — Follow-up &amp; Monitoring</h2>
+    <p><b>Baseline:</b> CBC w/ diff, CMP, HbA1c + fasting insulin, lipids, hs-CRP. Angiogenic/GH → add IGF-1, address malignancy, consider VEGF. Metabolic → fasting insulin/HbA1c. Immune/thymic → markers per case.</p>
+    <p><b>4–6 wk:</b> response/tolerance; class labs; adjust by response. <b>3 mo:</b> reassess vs. goal; VEGF declining on BPC-157/TB-500 → peptide holiday. <b>Ongoing q3–6 mo:</b> periodic labs; reconfirm goals.</p>
+
+    <h2>Section 6 — Per-Visit Documentation (SOAP)</h2>
+    <p><b>S/O/A/P</b> each visit; consent current on file; safety/malignancy reconfirmed if applicable; provider signature + date.</p>
+
+    ${s7}
+
+    <div class="statebox"><b>Regulatory currency.</b> The state-specific regulatory and consent content in this packet was researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and is believed up to date. Rules change — before using this program, confirm current requirements with your <b>state medical/nursing board</b> and your own <b>medico-legal counsel</b>.</div>
+
+    <h2>Master Disclaimer</h2>
+    <p style="font-size:12px;color:#666"><i>Educational/operational template from Practiced.Health. Not legal advice; establishes no collaborative, supervisory, or employment relationship. The purchasing provider is solely responsible for clinical decisions, prescribing, patient safety, consent, and compliance with all federal and state laws. Have this reviewed by your own medico-legal counsel before clinical use. State content reflects research current as of the delivery date and may change.</i></p>
+  `;
+}
+
+// ---------- ACCESS GATE ----------
+document.getElementById('signinLink').onclick = () => { location.href = '/'; };
+function unlock(){ document.getElementById('lock').style.display = 'none'; }
+function setOffer(kind){   // 'addon' (library member) or 'standalone'
+  document.getElementById('lockPrice').textContent = (kind === 'addon') ? PRICE_ADDON : PRICE_STANDALONE;
+  document.getElementById('unlockBtn').href = (kind === 'addon') ? UNLOCK_URL_ADDON : UNLOCK_URL_STANDALONE;
+}
+setOffer('standalone');   // default for a new visitor
+async function checkAccess(){
+  const q = new URLSearchParams(location.search);
+  if (q.get('preview') === 'unlocked'){ unlock(); return; }
+  const token = localStorage.getItem('pp_lic_token');
+  if (!token){ document.getElementById('lockMsg').textContent = 'New here? Purchase below. Already bought it? Sign in.'; return; }
+  try {
+    const r = await fetch('/api/builder-access', { headers: { Authorization: 'Bearer ' + token } });
+    const d = await r.json().catch(()=>({}));
+    if (r.ok && d.entitled){ unlock(); return; }
+    if (d.member){ setOffer('addon'); document.getElementById('lockMsg').textContent = 'Add it to your membership below.'; }
+    else { setOffer('standalone'); }
+  } catch(e){ document.getElementById('lockMsg').textContent = 'Could not verify access — please try again.'; }
+}
+
+render();
+checkAccess();
+</script>
+</body></html>

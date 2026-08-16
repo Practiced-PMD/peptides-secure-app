@@ -70,3 +70,24 @@ export async function deviceAllowed(email, device) {
   const list = (await devices().get(norm(email), { type: 'json' })) || [];
   return list.some((d) => d.device === device);
 }
+
+// ---- Builder add-on entitlement (a SEPARATE paid product from the library) ----
+// Buying the library does NOT unlock the Builder. Entitlement is granted either by
+// the Stripe webhook (a purchase whose metadata.product === 'builder') or manually
+// via the BUILDER_PAID_EMAILS env var (comma-separated) for early/comped buyers.
+const BUILDER_PAID = new Set(
+  String(process.env.BUILDER_PAID_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+);
+const builder = () => getStore('builder');
+export async function setBuilderEntitled(email) {
+  email = norm(email);
+  await builder().setJSON(email, { email, entitled: true, since: Math.floor(Date.now() / 1000) });
+}
+export async function isBuilderEntitled(email) {
+  if (BUILDER_PAID.has(norm(email))) return true;          // manual/comped grants
+  const rec = await builder().get(norm(email), { type: 'json' });
+  return !!(rec && rec.entitled);
+}

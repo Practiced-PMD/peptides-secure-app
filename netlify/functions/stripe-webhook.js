@@ -1,7 +1,7 @@
 // stripe-webhook.js — Stripe calls this when a payment succeeds.
 // Verifies Stripe's signature (no SDK needed) and records the buyer's email as paid.
 import crypto from 'node:crypto';
-import { setPaid, normEmail } from './_lib/store.js';
+import { setPaid, setBuilderEntitled, normEmail } from './_lib/store.js';
 import { sendWelcomeEmail } from './_lib/email.js';
 
 export const config = { path: '/api/stripe-webhook' };
@@ -38,15 +38,24 @@ export default async (req) => {
       case 'checkout.session.completed': {
         const email = o.customer_details?.email || o.customer_email;
         if (email) {
-          // period end if Stripe gave us one, else 1 year from now
-          const until = o.subscription && o.expires_at ? o.expires_at : Math.floor(Date.now() / 1000) + ONE_YEAR;
-          await setPaid(email, until, 'active');
-          // Post-payment welcome: sign-in instructions + PDF download link.
-          // Never fail the webhook if email delivery throws — Stripe must still get a 200.
-          try {
-            await sendWelcomeEmail(email, process.env.PDF_URL || '');
-          } catch (mailErr) {
-            console.error('welcome email failed (non-fatal):', mailErr && mailErr.message);
+          // Builder purchase — flagged by either the payment link's metadata
+          // (metadata.product='builder') or its client_reference_id ('builder',
+          // settable in the Stripe dashboard). Grants ONLY the Builder entitlement.
+          const isBuilder = o.metadata?.product === 'builder' || o.client_reference_id === 'builder';
+          if (isBuilder) {
+            await setBuilderEntitled(email);
+          } else {
+            // Library purchase (existing behavior, unchanged).
+            // period end if Stripe gave us one, else 1 year from now
+            const until = o.subscription && o.expires_at ? o.expires_at : Math.floor(Date.now() / 1000) + ONE_YEAR;
+            await setPaid(email, until, 'active');
+            // Post-payment welcome: sign-in instructions + PDF download link.
+            // Never fail the webhook if email delivery throws — Stripe must still get a 200.
+            try {
+              await sendWelcomeEmail(email, process.env.PDF_URL || '');
+            } catch (mailErr) {
+              console.error('welcome email failed (non-fatal):', mailErr && mailErr.message);
+            }
           }
         }
         break;
