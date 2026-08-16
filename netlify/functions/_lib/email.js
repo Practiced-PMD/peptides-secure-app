@@ -5,17 +5,17 @@
 //   SENDGRID_API_KEY   SG.xxxxx        (SendGrid API key, "Mail Send" permission)
 //   MAIL_FROM          "Peptides, Practiced. <access@practiced.health>"
 //   APP_NAME           "Peptides, Practiced."
-//   APP_URL            "https://peptides-practiced-app.netlify.app"  (link buyers click to open the app)
+//   APP_URL            "https://peptides.practiced.health"  (link buyers click to open the app)
 //
 // Exports the SAME function name the rest of the kit imports (sendCodeEmail),
-// plus sendWelcomeEmail(email, pdfUrl) used by the Stripe webhook post-payment.
+// plus sendWelcomeEmail(email) used by the Stripe webhook post-payment.
 
 const SENDGRID_ENDPOINT = 'https://api.sendgrid.com/v3/mail/send';
 
-// Where the app lives — used to give buyers a one-click link into the library.
-// Reads APP_URL if set, otherwise falls back to the live site so links always work.
+// Where the app lives — used to give buyers one-click links into the app.
+// Reads APP_URL if set, otherwise falls back to the live branded domain.
 function appUrl() {
-  return (process.env.APP_URL || 'https://peptides-practiced-app.netlify.app').replace(/\/+$/, '');
+  return (process.env.APP_URL || 'https://peptides.practiced.health').replace(/\/+$/, '');
 }
 
 // Parse a "Name <addr@x>" MAIL_FROM string into SendGrid's { email, name } shape.
@@ -81,11 +81,11 @@ export async function sendCodeEmail(toEmail, code) {
   return sendViaSendGrid({ to: toEmail, subject, text, html });
 }
 
-// Post-payment welcome: how to sign in + a one-click link into the app + the PDF download link.
-export async function sendWelcomeEmail(toEmail, pdfUrl) {
+// Post-payment welcome: how to sign in + a one-click link into the app + the gated PDF download.
+export async function sendWelcomeEmail(toEmail) {
   const app = process.env.APP_NAME || 'Your App';
   const url = appUrl();
-  const link = pdfUrl || process.env.PDF_URL || '';
+  const dl = url + '/download.html'; // gated download page (requires sign-in on that device)
   const safeEmail = String(toEmail).replace(/[<>&]/g, '');
   const subject = `Welcome to ${app} — here's how to get in`;
   const text =
@@ -95,7 +95,7 @@ export async function sendWelcomeEmail(toEmail, pdfUrl) {
     `  1. Go to ${url} and enter this email address (${toEmail}).\n` +
     `  2. We'll email you a 6-digit code.\n` +
     `  3. Enter the code to unlock. Your access works on up to 2 devices at once.\n\n` +
-    (link ? `Your PDF field guide: ${link}\n\n` : '') +
+    `Prefer the PDF pack? Once you're signed in, download the whole library here: ${dl}\n\n` +
     `Advanced medicine. Actual answers.`;
   const html = `
   <div style="font:16px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;color:#232a31;max-width:520px;margin:auto">
@@ -108,7 +108,8 @@ export async function sendWelcomeEmail(toEmail, pdfUrl) {
       <li>We'll email you a <b>6-digit code</b>.</li>
       <li>Enter the code to unlock. Your access works on up to <b>2 devices</b> at once.</li>
     </ol>
-    ${link ? `<p style="margin:0 0 16px"><a href="${link}" style="display:inline-block;background:#2E7D8A;color:#fff;padding:11px 18px;border-radius:9px;text-decoration:none;font-weight:600">Download your PDF field guide</a></p>` : ''}
+    <p style="margin:0 0 6px;color:#232a31;font-weight:600">Prefer a downloadable PDF pack?</p>
+    <p style="margin:0 0 16px"><a href="${dl}" style="display:inline-block;background:#2E7D8A;color:#fff;padding:11px 18px;border-radius:9px;text-decoration:none;font-weight:600">Download your PDF library</a><br><span style="font-size:12.5px;color:#8a94a0">You'll be asked to sign in first (same email) — that keeps the library members-only.</span></p>
     <p style="margin:18px 0 0;color:#2E7D8A;font-style:italic">Advanced medicine. Actual answers.</p>
   </div>`;
   return sendViaSendGrid({ to: toEmail, subject, text, html });
