@@ -288,6 +288,14 @@ async function checkAccess(){
   } catch(e){ document.getElementById('lockMsg').textContent = 'Could not verify access — please try again.'; }
 }
 
+// Live-update the packet as the user types in any text field (not just dropdowns)
+['clinic','address','phone','email','provider','creds','fees'].forEach(function(id){
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', render);
+});
+var _mdl = document.getElementById('model');
+if (_mdl) _mdl.addEventListener('change', render);
+
 render();
 checkAccess();
 </script>
