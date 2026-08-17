@@ -163,6 +163,18 @@ const STATES_BUILT = {
       <p>Texas requires the CAM disclosure/consent under 22 TAC §171.2 (built into the consent above). Keep the signed form in the record.</p>
       <h3>7.3 — Sourcing</h3>
       <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability.</p>`
+  },
+  "California": {
+    consentCompliance: `<div class="statebox"><b>California:</b> This therapy is offered as complementary/alternative medicine. Consistent with California Business &amp; Professions Code § 2234.1, the provider conducted a good-faith prior examination, disclosed conventional treatment options and the provider's education, experience, and credentials in this therapy, and obtained the patient's informed consent. <i>Verify current requirements with your own California counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Confirm your <b>standardized procedures / practice authority</b> (or, for a PA, your <b>practice agreement</b>) authorize the peptide drug categories you'll prescribe. California NPs may also qualify for expanded independence under <b>AB 890</b> (the "103"/"104" categories) — verify your current status and requirements with the California Board of Registered Nursing.</p>
+      <h3>7.2 — Consent (shapes the consent above)</h3>
+      <p>California's CAM statute (<b>B&amp;P § 2234.1</b>) calls for informed consent and a good-faith prior examination, disclosure of conventional treatment options, and disclosure of the provider's education, experience, and credentials in the therapy offered. All three are built into the consent above.</p>
+      <h3>7.3 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability and any California Board of Pharmacy office-use requirements.</p>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>California expects a <b>good-faith prior examination</b> and the in-person standard of care before prescribing. <i>Confirm current California telehealth-prescribing rules.</i></p>`
   }
 };
 
@@ -234,16 +246,52 @@ function render(){
     <p><b>Provider safety screen:</b> <span class="ck">☐</span> malignancy addressed before angiogenic/GH peptide · <span class="ck">☐</span> pregnancy confirmed · <span class="ck">☐</span> start-low plan if sensitive · <span class="ck">☐</span> mold/CIRS status noted</p>
 
     <h2>Section 3 — Informed Consent (CAM / Peptide Therapy)</h2>
-    <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds}</p>
-    <p><b>Collaborating/Supervising Physician (only if required in your state):</b> <span class="blank">[name or N/A]</span></p>
-    <p>This consent covers the treatment plan, testing, potential benefits, and risks of the peptide/CAM treatment offered. Read carefully; ask questions; you may withdraw consent at any time. Some agents are compounded or investigational and not FDA-approved for this use.</p>
+    <p><b>Practice/Clinic:</b> ${clinic} &nbsp; <b>Treating Provider:</b> ${prov}, ${creds}</p>
+    <p><b>Patient Name:</b> ____________________ &nbsp; <b>DOB:</b> _________ &nbsp; <b>Date:</b> _________</p>
+    <p>This Consent describes the treatment plan, anticipated laboratory/diagnostic testing, potential benefits, and possible risks of the peptide/CAM treatment being offered. Take your time, read it carefully, and ask any questions. When your questions are answered to your satisfaction, you will be asked to sign. Do not allow yourself to be pressured. You may withdraw your consent at any time.</p>
+    <p>Your provider will review this Consent with you in detail and keep it in your medical record. The provider is responsible for maintaining an accurate, complete record, including documentation of this discussion and of any off-label or CAM treatment.</p>
+    <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+
+    <h3>Conditions/diagnoses for which treatment is offered (check all)</h3>
+    <p><span class="ck">☐</span> Lifestyle &amp; Preventative · <span class="ck">☐</span> Metabolic &amp; Cardiovascular · <span class="ck">☐</span> GI &amp; Microbiome · <span class="ck">☐</span> Mental Health &amp; Stress · <span class="ck">☐</span> Tick-Borne Illness · <span class="ck">☐</span> Infectious Disease · <span class="ck">☐</span> Detoxification &amp; Environmental · <span class="ck">☐</span> Endocrine &amp; Hormonal · <span class="ck">☐</span> Immune &amp; Inflammatory · <span class="ck">☐</span> Neurological &amp; Cognitive · <span class="ck">☐</span> Other: _______</p>
+
+    <h3>Treatment(s) offered (check all)</h3>
+    <p><span class="ck">☐</span> Peptide therapy · <span class="ck">☐</span> Cellular-derived biologics · <span class="ck">☐</span> IV nutrient therapy · <span class="ck">☐</span> Hormone optimization/BHRT · <span class="ck">☐</span> Functional/advanced lab testing · <span class="ck">☐</span> Other: _______</p>
+
+    <h3>Peptide Therapy Benefits Menu — goals discussed (potential goals, not guarantees)</h3>
+    <p><span class="ck">☐</span> Tissue repair &amp; recovery · <span class="ck">☐</span> Gut &amp; GI barrier · <span class="ck">☐</span> Immune support · <span class="ck">☐</span> Metabolic &amp; weight · <span class="ck">☐</span> Energy &amp; mitochondrial · <span class="ck">☐</span> Cognitive &amp; mood · <span class="ck">☐</span> Sleep · <span class="ck">☐</span> Skin, hair &amp; aesthetic · <span class="ck">☐</span> Sexual health &amp; libido · <span class="ck">☐</span> Longevity &amp; healthy aging · <span class="ck">☐</span> Other: _______</p>
+
+    <h3>1. Assessment — provider &amp; patient initial each line ("N/A" if not applicable)</h3>
+    <p>___ Conventional methods of diagnosis and nonconventional methods were described.</p>
+    <p>___ An appropriate medical history and physical examination was completed.</p>
+    <p>___ Conventional treatment options were discussed, with referral input if needed.</p>
+    <p>___ Any prior conventional treatments and their outcomes were obtained (including whether the patient declined conventional options).</p>
+    <p>___ It was assessed whether this therapy could interfere with any other ongoing or recommended treatment.</p>
+    <p>___ A good-faith prior examination of the patient was performed.</p>
+
+    <h3>2. Disclosure — discussed in detail; all questions answered; initial each line</h3>
+    <p>___ The objectives / expected outcomes / goals (e.g., functional improvement, recovery, symptom relief, or well-being).</p>
+    <p>___ The risks and benefits of the proposed treatment.</p>
+    <p>___ The extent it could interfere with ongoing/recommended care.</p>
+    <p>___ A plain-language description of the mechanism / therapeutic basis.</p>
+    <p>___ Whether an agent used is: (a) FDA-approved for human use; (b) exempt from FDA preapproval under DSHEA (a supplement); or (c) a pharmaceutical compound not commercially available and subject to clinical investigation standards (covers compounded and investigational peptides, including professional-use agents not from a compounding pharmacy).</p>
+    <p>___ An individualized, documented treatment plan considering history, records, exam, and need for further testing/consults/referrals.</p>
+    <p>___ The favorable risk/benefit compared to other treatments for the same condition.</p>
+    <p>___ A reasonable expectation of a favorable outcome, including prevention.</p>
+    <p>___ The expectation of greater benefit than no treatment.</p>
+    <p>___ The provider's education, experience, and credentials in this therapy were disclosed.</p>
+    <p>___ Periodic review at reasonable intervals will consider (a) the patient's progress and (b) new information about the cause of the complaint.</p>
+
+    <h3>3. Patient acknowledgment</h3>
+    <p><span class="ck">☐</span> I have read this form (or had it read to me) and had all my questions answered.</p>
+    <p><span class="ck">☐</span> I understand the therapy may not be FDA-approved for this use and may be compounded or investigational.</p>
+    <p><span class="ck">☐</span> I understand no specific result is guaranteed.</p>
+    <p><span class="ck">☐</span> I understand this treatment will not delay appropriate conventional diagnosis or care.</p>
+    <p><span class="ck">☐</span> My consent is voluntary and I may withdraw it at any time.</p>
+    <p><b>Patient printed name:</b> ____________________</p>
+    <p><b>Patient signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+    <p><b>Witness (if used):</b> ____________________ &nbsp; <b>Date:</b> _________</p>
     ${st.consentCompliance}
-    <h3>Peptide Therapy Benefits Menu (check goals discussed — potential goals, not guarantees)</h3>
-    <p><span class="ck">☐</span> Tissue repair &amp; recovery · <span class="ck">☐</span> Gut &amp; GI barrier · <span class="ck">☐</span> Immune support · <span class="ck">☐</span> Metabolic &amp; weight · <span class="ck">☐</span> Energy &amp; mitochondrial · <span class="ck">☐</span> Cognitive &amp; mood · <span class="ck">☐</span> Sleep · <span class="ck">☐</span> Skin, hair &amp; aesthetic · <span class="ck">☐</span> Sexual health &amp; libido · <span class="ck">☐</span> Longevity &amp; healthy aging</p>
-    <h3>Required disclosure &amp; acknowledgment (initial each)</h3>
-    <p>Assessment (conventional/nonconventional diagnosis described; hx &amp; exam done; conventional options discussed; prior tx obtained; interference assessed). Disclosure (objectives; risks/benefits; interference; plain-language mechanism; FDA/DSHEA/investigational status; individualized plan; favorable risk-benefit; reasonable expectation of benefit; periodic review).</p>
-    <p><span class="ck">☐</span> I have read this and had questions answered · <span class="ck">☐</span> I understand it may be non-FDA-approved/investigational · <span class="ck">☐</span> No result guaranteed; consent voluntary &amp; revocable</p>
-    <p>Patient: _______ Signature: _______ Date: ___ &nbsp;|&nbsp; Provider: _______ Date: ___</p>
 
     <h2>Section 4 — Patient Conversation Script + FAQ</h2>
     <p><b>Goals first:</b> "Let's start with what you're hoping to feel or fix — peptides work best aimed at a goal, not as a general tonic."</p>
