@@ -369,6 +369,7 @@ function buildNav(active){
   const nav = document.getElementById('nav');
   let html = '<div class="nav-item'+(active==='home'?' active':'')+'" onclick="showHome()"><span class="nav-code">★</span><span>Library Home</span></div>';
   html += '<div class="nav-item calc-item'+(active==='calc'?' active':'')+'" onclick="showCalc()"><span class="nav-code">🧮</span><span>Dose Calculator</span></div>';
+  html += '<div class="nav-item" onclick="location.href=\'/builder\'"><span class="nav-code">🔒</span><span>Compliance-Ready Peptide Program <span class="preview-badge" style="background:#BF8F00;color:#fff">New</span></span></div>';
   GROUPS.forEach(g=>{
     const items = DATA.filter(d=>d.kind===g.kind);
     if(!items.length) return;
