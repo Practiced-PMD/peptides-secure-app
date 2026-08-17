@@ -85,7 +85,7 @@
     <a class="btn" id="unlockBtn" href="#">Unlock Access →</a>
     <div class="price">One-time · <b id="lockPrice">$797</b></div>
     <div class="msg" id="lockMsg"></div>
-    <div class="signin" style="margin-top:16px;background:rgba(143,227,211,.10);border:1px solid rgba(143,227,211,.30);border-radius:10px;padding:12px 15px;line-height:1.5">✨ Already a <b>Peptides, Practiced.</b> member? <a id="signinLink" style="color:#8fe3d3;font-weight:700;text-decoration:underline;cursor:pointer">Sign in</a> to see your discounted member add-on price.</div>
+    <div class="signin">Already purchased? <a id="signinLink">Sign in</a></div>
     <div style="margin-top:16px;font-size:12px;color:#9fbcc4">By purchasing you agree to our <a href="/terms" target="_blank" style="color:#cfe6e8;text-decoration:underline">Terms of Service</a>.</div>
     <div style="margin-top:14px;font-size:12.5px"><a href="/" style="color:#9fbcc4;text-decoration:underline">← Back to the Peptide Library</a></div>
   </div>
@@ -267,7 +267,7 @@ function render(){
 }
 
 // ---------- ACCESS GATE ----------
-document.getElementById('signinLink').onclick = () => { try{ localStorage.setItem('pp_after_signin','/builder'); }catch(e){} location.href = '/'; };
+document.getElementById('signinLink').onclick = () => { location.href = '/'; };
 function unlock(){ document.getElementById('lock').style.display = 'none'; }
 function setOffer(kind){   // 'addon' (library member) or 'standalone'
   document.getElementById('lockPrice').textContent = (kind === 'addon') ? PRICE_ADDON : PRICE_STANDALONE;

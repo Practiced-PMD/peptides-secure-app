@@ -600,9 +600,6 @@ function siVerify(){
         let extra='';
         if(res.j.evicted && res.j.evicted.length){ extra=' An older device was signed out (2-device limit).'; }
         msg.style.color='#2E7D8A'; msg.textContent='Unlocked. Welcome in.'+extra;
-        // If the user came from the Compliance-Ready Program to sign in, send them back there.
-        var after=null; try{ after=localStorage.getItem('pp_after_signin'); }catch(e){}
-        if(after){ try{ localStorage.removeItem('pp_after_signin'); }catch(e){} setTimeout(function(){ location.href=after; }, 600); return; }
         const ret = window._siReturn || 'home';
         setTimeout(function(){ if(ret==='home' || !ret){ showHome(); } else { showDoc(ret); } }, 500);
       } else {
