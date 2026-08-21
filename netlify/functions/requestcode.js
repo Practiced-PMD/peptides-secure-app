@@ -1,0 +1,28 @@
+// request-code.js — user types their email; if paid, email them a 6-digit code.
+// Always returns the same friendly message (don't reveal who has paid).
+import crypto from 'node:crypto';
+import { isPaidNow, isBuilderEntitled, putCode, normEmail } from './_lib/store.js';
+import { sendCodeEmail } from './_lib/email.js';
+
+export const config = { path: '/api/request-code' };
+
+const OK = { ok: true, message: 'If that email has an active purchase, we just sent it a 6-digit code. Check your inbox (and spam).' };
+const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json' } });
+
+export default async (req) => {
+  if (req.method !== 'POST') return json({ ok: false, message: 'POST only' }, 405);
+  let email;
+  try { ({ email } = await req.json()); } catch { return json({ ok: false, message: 'bad request' }, 400); }
+  email = normEmail(email);
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ ok: false, message: 'Please enter a valid email.' }, 400);
+
+  // Paid library members OR standalone Builder buyers get a code.
+  // (Builder-only buyers never bought the library but must still be able to sign in.)
+  if ((await isPaidNow(email)) || (await isBuilderEntitled(email))) {
+    const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
+    await putCode(email, code, 1800); // code valid for 30 minutes (was 600 = 10 min)
+    try { await sendCodeEmail(email, code); }
+    catch (e) { return json({ ok: false, message: 'We could not send the email right now. Please try again shortly.' }, 502); }
+  }
+  return json(OK);
+};
