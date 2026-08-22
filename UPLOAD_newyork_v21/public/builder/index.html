@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Compliance-Ready Peptide Program — Practiced.Health</title>
+<style>
+  :root{--navy:#1F3A5F;--navy2:#16293f;--teal:#2E7D8A;--mint:#8fe3d3;--amber:#BF8F00;
+    --bg:#eef2f2;--card:#fff;--ink:#232a31;--muted:#6b7783;--line:#e2e6e6;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --serif:'Fraunces',Georgia,serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.55}
+  header{background:linear-gradient(135deg,var(--navy2),var(--teal));color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  header .brand{display:flex;align-items:center;gap:12px}
+  header .mk{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;font-size:22px}
+  header .t{font-family:var(--serif);font-size:19px;font-weight:600}
+  header .t small{display:block;font-family:var(--sans);font-size:11px;color:#cfe6e8;font-style:italic;font-weight:400}
+  header button{background:rgba(255,255,255,.15);color:#fff;border:none;font-weight:700;font-size:13px;padding:10px 16px;border-radius:9px;cursor:pointer}
+  .wrap{display:grid;grid-template-columns:360px 1fr;height:calc(100vh - 72px)}
+  .panel{background:#f7f9f9;border-right:1px solid var(--line);overflow-y:auto;padding:20px 20px 60px}
+  .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--teal);font-weight:800;margin:18px 0 8px}
+  .panel h2:first-child{margin-top:0}
+  .fld{margin-bottom:11px}
+  .fld label{display:block;font-size:12px;font-weight:600;color:var(--navy);margin-bottom:3px}
+  .fld input,.fld select{width:100%;padding:8px 10px;border:1px solid #cfd8d8;border-radius:8px;font-size:13px;font-family:var(--sans);background:#fff}
+  .hint{font-size:11px;color:var(--muted);margin-top:2px}
+  .pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px;vertical-align:1px}
+  .pill.on{background:#e7f6f2;color:#1f6b5c}.pill.off{background:#f1f1f1;color:#888}
+  .preview{overflow-y:auto;padding:26px 30px 80px;background:#dfe4e4}
+  .doc{max-width:820px;margin:0 auto;background:#fff;box-shadow:0 6px 30px rgba(0,0,0,.1);padding:48px 54px;border-radius:6px}
+  .doc h1{font-family:var(--serif);font-size:26px;color:var(--navy);line-height:1.15;margin-bottom:4px}
+  .doc .subtitle{font-size:14px;color:var(--teal);font-weight:600}
+  .doc .brandline{font-size:12px;color:var(--muted);margin-bottom:18px}
+  .doc h2{font-family:var(--serif);font-size:18px;color:var(--navy);margin:26px 0 8px;padding-bottom:5px;border-bottom:2px solid #e7ecec}
+  .doc h3{font-size:13px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 5px}
+  .doc p{font-size:13.5px;margin-bottom:9px}
+  .doc .fillval{background:#fff7e0;border-bottom:1px solid #e6c766;padding:0 4px;font-weight:600;color:#5c4708}
+  .doc .blank{color:#b9bfbf}
+  .doc .disc{background:#fff7ef;border:1px solid #f0d9b8;border-left:4px solid var(--amber);padding:11px 14px;border-radius:8px;font-size:12.5px;color:#5c4708;margin:14px 0}
+  .doc .statebox{background:#eef6f9;border:1px solid #cfe3ea;border-left:4px solid var(--teal);padding:11px 14px;border-radius:8px;font-size:12.5px;margin:12px 0}
+  .doc .ck{color:var(--teal);font-weight:700}
+  /* lock */
+  .lock{position:fixed;inset:0;z-index:50;background:linear-gradient(150deg,#16293f,#1F3A5F 55%,#2E7D8A);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px}
+  .lock .card{max-width:520px;text-align:center}
+  .lock .ic{font-size:44px;margin-bottom:14px}
+  .lock h1{font-family:var(--serif);font-size:32px;font-weight:600;margin-bottom:10px}
+  .lock h1 .d{color:var(--mint)}
+  .lock p{font-size:15.5px;color:#e7f1f3;margin-bottom:10px;line-height:1.55}
+  .lock .feats{text-align:left;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:16px 18px;margin:18px 0;font-size:14px}
+  .lock .feats li{margin:5px 0 5px 6px;list-style:none;display:flex;gap:9px;align-items:flex-start}
+  .lock .feats li:before{content:"✓";color:var(--mint);font-weight:800}
+  .lock .email{width:100%;padding:12px 14px;border-radius:10px;border:none;font-size:15px;margin:6px 0 10px}
+  .lock .btn{display:inline-block;background:var(--amber);color:#1a1400;font-weight:800;font-size:16px;padding:14px 30px;border-radius:11px;border:none;cursor:pointer;text-decoration:none}
+  .lock .signin{margin-top:14px;font-size:13.5px;color:#cfe6e8}
+  .lock .signin a{color:#fff;font-weight:600;cursor:pointer}
+  .lock .price{font-size:13px;color:#bcd7dc;margin-top:12px}
+  .lock .msg{font-size:12.5px;color:#ffd9d9;margin-top:10px;min-height:16px}
+  @media print{
+    .lock,header,.panel{display:none !important}
+    .wrap{display:block;height:auto}.preview{overflow:visible;padding:0;background:#fff}
+    .doc{box-shadow:none;max-width:none;padding:0;border-radius:0}
+    .doc h2{page-break-after:avoid}
+  }
+</style></head>
+<body>
+<div style="background:#16293f;display:flex;justify-content:center;gap:8px;padding:7px 10px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;position:relative;z-index:60">
+  <a href="/" style="background:rgba(255,255,255,.10);color:#cfe6e8;font-weight:700;font-size:13px;padding:7px 15px;border-radius:8px;text-decoration:none">📚 Peptide Library</a>
+  <span style="background:#2E7D8A;color:#fff;font-weight:700;font-size:13px;padding:7px 15px;border-radius:8px">🔒 Compliance-Ready Program</span>
+</div>
+
+<!-- LOCK SCREEN -->
+<div class="lock" id="lock">
+  <div class="card">
+    <div class="ic">🔒</div>
+    <h1>Compliance-Ready Peptide Program<span class="d">.</span></h1>
+    <p>The <b>state-specific compliance documents</b> you need to add peptides to your
+    practice — intake, consent, patient scripts, monitoring, and documentation —
+    generated and branded for your clinic in minutes.</p>
+    <ul class="feats">
+      <li>Your clinic + provider details auto-filled throughout</li>
+      <li>State-specific regulatory &amp; consent language for your state</li>
+      <li>NP/PA vs. physician logic handled automatically</li>
+      <li>Print or save each form as a fillable PDF</li>
+    </ul>
+    <input class="email" id="lockEmail" placeholder="Email you purchased with">
+    <a class="btn" id="unlockBtn" href="#">Unlock Access →</a>
+    <div class="price">One-time · <b id="lockPrice">$797</b></div>
+    <div class="msg" id="lockMsg"></div>
+    <div class="signin" style="margin-top:16px;background:rgba(143,227,211,.10);border:1px solid rgba(143,227,211,.30);border-radius:10px;padding:12px 15px;line-height:1.5">✨ Already a <b>Peptides, Practiced.</b> member? <a id="signinLink" style="color:#8fe3d3;font-weight:700;text-decoration:underline;cursor:pointer">Sign in</a> to see your discounted member add-on price.</div>
+    <div style="margin-top:16px;font-size:12px;color:#9fbcc4">By purchasing you agree to our <a href="/terms" target="_blank" style="color:#cfe6e8;text-decoration:underline">Terms of Service</a>.</div>
+    <div style="margin-top:14px;font-size:12.5px"><a href="/" style="color:#9fbcc4;text-decoration:underline">← Back to the Peptide Library</a></div>
+  </div>
+</div>
+
+<header>
+  <div class="brand"><div class="mk">P</div>
+    <div class="t">Compliance-Ready Peptide Program<small>Practiced.Health · state-specific compliance documents for your practice</small></div></div>
+  <button onclick="window.print()">🖨 Print / Save PDF</button>
+</header>
+<div class="wrap">
+  <div class="panel">
+    <h2>Practice</h2>
+    <div class="fld"><label>Clinic / practice name</label><input id="clinic" placeholder="Your clinic name"></div>
+    <div class="fld"><label>Address</label><input id="address" placeholder="Street, City, ST ZIP"></div>
+    <div class="fld"><label>Phone</label><input id="phone" placeholder="(xxx) xxx-xxxx"></div>
+    <div class="fld"><label>Email / website</label><input id="email" placeholder="clinic@example.com"></div>
+    <h2>Provider</h2>
+    <div class="fld"><label>Provider name</label><input id="provider" placeholder="Full name"></div>
+    <div class="fld"><label>Credentials</label><input id="creds" placeholder="e.g., APRN, FNP-C"></div>
+    <div class="fld"><label>License type <span id="s7pill" class="pill off">Section 7 off</span></label>
+      <select id="license" onchange="render()">
+        <option value="NP">Nurse Practitioner (APRN)</option>
+        <option value="PA">Physician Assistant (PA)</option>
+        <option value="MD">Physician (MD)</option>
+        <option value="DO">Physician (DO)</option>
+      </select>
+      <div class="hint">State regulatory section is included for all license types. Physicians also see it — as the reference for NPs/PAs they supervise.</div></div>
+    <div class="fld"><label>Practice model</label>
+      <select id="model"><option>Independent</option><option>Collaborative / supervised</option><option>Group practice</option></select></div>
+    <h2>State &amp; tier</h2>
+    <div class="fld"><label>State of practice</label>
+      <select id="state" onchange="render()"></select>
+      <div class="hint">Built states load their specific wording; others use the general note until built.</div></div>
+    <div class="fld"><label>Program fees (optional)</label><input id="fees" placeholder="e.g., $X / month"></div>
+    <button type="button" id="applyBtn" onclick="applyChanges()" style="width:100%;margin-top:14px;background:#1F3A5F;color:#fff;border:none;font-weight:700;font-size:15px;padding:13px 16px;border-radius:9px;cursor:pointer">Update document →</button>
+    <div class="hint" style="margin-top:10px">The packet updates as you type. If any change doesn't show, click <b>Update document</b> to push everything over. Then Print / Save PDF.</div>
+  </div>
+  <div class="preview"><div class="doc" id="doc"></div></div>
+</div>
+
+<script>
+// ---------- CONFIG ----------
+const PRICE_ADDON = '$397';         // existing library member add-on
+const PRICE_STANDALONE = '$797';    // standalone buyer (never bought the library)
+const UNLOCK_URL_ADDON = 'https://buy.stripe.com/4gMdR9gKue7OgqY5NCfIs04?client_reference_id=builder';       // $397 add-on
+const UNLOCK_URL_STANDALONE = 'https://buy.stripe.com/14A9AT3XI1l2caIa3SfIs03?client_reference_id=builder'; // $797 standalone
+const STATE_RESEARCHED_AS_OF = 'August 2026';   // update when states are re-reviewed
+
+// ---------- STATES ----------
+const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+
+const GENERAL = {
+  consentCompliance: `<div class="statebox"><b>‹State content — not yet built for this state›</b> This general CAM consent (national FSMB model) applies. Confirm your state's informed-consent/CAM requirements with your own counsel.</div>`,
+  section7: null
+};
+
+const STATES_BUILT = {
+  "Louisiana": {
+    consentCompliance: `<div class="statebox"><b>Louisiana:</b> Louisiana has no Texas-style dedicated CAM-consent rule. This general CAM consent (national FSMB model) applies, layered with Louisiana's ordinary informed-consent law. <i>Verify current requirements with your own Louisiana counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Louisiana is a <b>reduced/restricted-practice</b> state: an APRN cannot practice or prescribe independently and works under a Collaborative Practice Agreement (CPA) with a physician. This packet does not set up your CPA — an established practice already has one.</p>
+      <p><i>Confirm your existing collaborative agreement's approved drug categories already cover the peptide classes you'll prescribe.</i> (Pending bill LA H 495 would grant full practice authority — not law; do not rely on it.)</p>
+      <h3>7.2 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> obtained from another lawful professional-use/investigational source (e.g., Thymalin). Do not assume a compounding pharmacy is the only channel; confirm each agent's current legal availability.</p>
+      <h3>7.3 — Telehealth (if used)</h3>
+      <p>Louisiana's rules for establishing the provider-patient relationship and any exam requirement before prescribing apply. <i>Verify current Louisiana telehealth-prescribing rules with counsel.</i></p>`,
+    sources: `Louisiana State Board of Nursing (lsbn.state.la.us); Louisiana State Board of Medical Examiners (lsbme.la.gov) for physicians and physician assistants; Louisiana Board of Pharmacy.`
+  },
+  "Texas": {
+    consentCompliance: `<div class="statebox"><b>Texas compliance statement:</b> This form complies with the disclosure requirements in Texas Administrative Code, Title 22, Part 9, Chapter 171, §171.2 (Complementary and Alternative Medicine). The treating provider has made the required disclosures, discussed conventional and nonconventional options, and documented consent in the medical record. <i>Verify current requirements with your own Texas counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Texas APRNs prescribe under a <b>prescriptive authority agreement</b> with a delegating physician. This packet does not set that up — an established practice already has one. <i>Confirm your agreement's authorized drug categories cover the peptide classes you'll prescribe.</i></p>
+      <h3>7.2 — Consent</h3>
+      <p>Texas requires the CAM disclosure/consent under 22 TAC §171.2 (built into the consent above). Keep the signed form in the record.</p>
+      <h3>7.3 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability.</p>`,
+    sources: `Texas Board of Nursing (bon.texas.gov); Texas Medical Board (tmb.texas.gov) — incl. 22 TAC § 171.2 (CAM) and PA rules; Texas State Board of Pharmacy.`
+  },
+  "California": {
+    consentCompliance: `<div class="statebox"><b>California:</b> This therapy is offered as complementary/alternative medicine. Consistent with California Business &amp; Professions Code § 2234.1, the provider conducted a good-faith prior examination, disclosed conventional treatment options and the provider's education, experience, and credentials in this therapy, and obtained the patient's informed consent. <i>Verify current requirements with your own California counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Confirm your <b>standardized procedures / practice authority</b> (or, for a PA, your <b>practice agreement</b>) authorize the peptide drug categories you'll prescribe. California NPs may also qualify for expanded independence under <b>AB 890</b> (the "103"/"104" categories) — verify your current status and requirements with the California Board of Registered Nursing.</p>
+      <h3>7.2 — Consent (shapes the consent above)</h3>
+      <p>California's CAM statute (<b>B&amp;P § 2234.1</b>) calls for informed consent and a good-faith prior examination, disclosure of conventional treatment options, and disclosure of the provider's education, experience, and credentials in the therapy offered. All three are built into the consent above.</p>
+      <h3>7.3 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability and any California Board of Pharmacy office-use requirements.</p>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>California expects a <b>good-faith prior examination</b> and the in-person standard of care before prescribing. <i>Confirm current California telehealth-prescribing rules.</i></p>`,
+    sources: `California Board of Registered Nursing — AB 890 (rn.ca.gov/practice/ab890); Medical Board of California (mbc.ca.gov) for physicians and physician assistants; California Business &amp; Professions Code § 2234.1; California State Board of Pharmacy.`
+  },
+  "Florida": {
+    consentCompliance: `<div class="statebox"><b>Florida:</b> This therapy is offered as a complementary or alternative health care treatment under Florida Statute § 456.41. Consistent with that statute, the provider has informed the patient of the nature of the treatment and its benefits and risks, disclosed the provider's education, experience, and credentials in this therapy, obtained the patient's informed consent, and documented in the record how these requirements were met. <i>Verify current requirements with your own Florida counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Florida APRNs practice either under a written <b>protocol/supervisory relationship with a physician</b> (traditional) or, if registered under <b>Fla. Stat. § 464.0123</b> after <b>≥3,000 clinical practice hours in the preceding 5 years</b>, as an <b>autonomous APRN</b> — but autonomous practice is statutorily <b>limited to primary care</b> (family medicine, general pediatrics, general internal medicine). A peptide/regenerative-wellness program may sit outside that primary-care box, so an autonomous APRN should confirm scope or maintain the appropriate physician relationship for it. <b>PAs</b> practice under physician supervision (Fla. Stat. § 458.347). Autonomous registration does not expand controlled-substance authority — most peptides aren't scheduled; confirm each agent.</p>
+      <h3>7.2 — Consent (shapes the consent above) — Fla. Stat. § 456.41</h3>
+      <p>Florida's CAM statute applies to <b>all licensed health care practitioners — APRNs, PAs, and physicians alike</b>. Before providing a CAM treatment, inform the patient of the nature of the treatment and its benefits and risks, disclose the provider's education, experience, and credentials in that therapy, and document in the record how those requirements were met. All of this is built into the consent above.</p>
+      <h3>7.3 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability and any Florida Board of Pharmacy office-use/compounding requirements.</p>
+      <h3>7.4 — Telehealth (if used) — Fla. Stat. § 456.47</h3>
+      <p>Florida permits establishing the practitioner–patient relationship and prescribing via telehealth if the evaluation is sufficient to diagnose and treat and meets the prevailing standard of care; a physical exam is not strictly required. Schedule II controlled substances are restricted via telehealth (narrow exceptions). <i>Confirm current Florida telehealth-prescribing rules.</i></p>`,
+    sources: `Florida Board of Nursing (floridasnursing.gov); Florida Board of Medicine (flboardofmedicine.gov) for physicians and physician assistants; Fla. Stat. § 464.0123 (autonomous APRN), § 456.41 (CAM treatments), § 456.47 (telehealth), § 458.347 (PAs); Florida Board of Pharmacy.`
+  },
+  "New York": {
+    consentCompliance: `<div class="statebox"><b>New York:</b> This therapy is offered as non-conventional care consistent with New York Education Law § 6527(4)(e). The provider has explained the nature of the treatment, its benefits and risks, and the basis for expecting it to effectively address the patient's condition; disclosed the provider's education, experience, and credentials in this therapy; obtained the patient's informed consent; and documented the clinical rationale in the record. <i>Verify current requirements — including New York's patient-specific compounding/dispensing rules — with your own New York counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners</b> follow an experience tier: an NP with <b>more than 3,600 hours</b> of qualifying practice may practice <b>independently — no written collaborative agreement</b> (the NP Modernization Act replaced it with a duty to maintain collaborative relationships); an NP with <b>3,600 hours or fewer</b> practices under written practice protocols and a written practice agreement with a collaborating physician. <b>PAs</b> practice under physician supervision; an experienced PA with <b>more than 8,000 hours</b> may practice without supervision in primary-care fields or with hospital/health-system privileges (note the primary-care limitation). <b>Physicians (MD/DO)</b> have independent authority.</p>
+      <h3>7.2 — Consent — Education Law § 6527(4)(e)</h3>
+      <p>New York has <b>no dedicated CAM-consent statute</b>. It protects a practitioner's "use of whatever medical care, conventional or non-conventional, which <b>effectively treats</b>" the condition (§ 6527(4)(e); non-conventional treatment defined at § 6531; 8 NYCRR § 29.2). Because the protection turns on the treatment effectively treating the condition, <b>document the clinical rationale, expected benefit, and monitoring</b>. The consent above already captures the required elements; New York adds no consent-form requirement.</p>
+      <h3>7.3 — Sourcing — the New York gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>New York restricts office-stock compounding — the channel determines legality.</b> A traditional <b>503A compounding pharmacy may not prepare office-stock/office-use sterile compounds without a patient-specific prescription</b> (New York restricted sterile office-stock compounding even before the federal DQSA — 8 NYCRR §§ 29.1–29.2; Education Law Article 137). Office vials for in-office administration must instead come from a <b>503B outsourcing facility</b>, federally registered to make office-stock sterile products — if the specific peptide is available from one. <b>Bottom line: 503A = patient-specific prescription; office stock = 503B outsourcing facility.</b> Confirm each peptide's 503B availability and current NY Board of Pharmacy requirements before relying on office vials.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>New York permits telehealth (Public Health Law Article 29-G) with a valid practitioner–patient relationship and the in-person standard of care. <i>Confirm current New York telehealth-prescribing rules.</i></p>`,
+    sources: `New York State Education Department, Office of the Professions — Nursing / Medicine / Physician Assistants / Pharmacy (op.nysed.gov); New York State Board for Medicine; NY Education Law §§ 6527(4)(e), 6531, 6542, 6810, 6902 and Article 137 (Pharmacy); 8 NYCRR §§ 29.1–29.2; NY Public Health Law Article 29-G (telehealth); federal 503A vs. 503B compounding framework (FDCA §§ 503A, 503B).`
+  }
+};
+
+function stateData(name){ return STATES_BUILT[name] || GENERAL; }
+
+// populate dropdown
+(function(){
+  const sel = document.getElementById('state');
+  sel.innerHTML = US_STATES.map(s => `<option value="${s}">${s}${STATES_BUILT[s]?'':'  (general)'}</option>`).join('');
+  sel.value = 'Louisiana';
+})();
+
+function v(id){ return document.getElementById(id).value.trim(); }
+function fill(val, ph){ return val ? `<span class="fillval">${val}</span>` : `<span class="blank">[${ph}]</span>`; }
+
+function render(){
+  const st = stateData(v('state'));
+  const lic = v('license');
+  const mid = (lic === 'NP' || lic === 'PA');
+  const pill = document.getElementById('s7pill');
+  const s7on = !!st.section7;
+  pill.className = 'pill ' + (s7on ? 'on' : 'off');
+  pill.textContent = s7on ? 'Section 7 on' : 'Section 7 off';
+
+  const clinic = fill(v('clinic'),'Clinic name');
+  const prov = fill(v('provider'),'Provider name');
+  const creds = v('creds') ? `<span class="fillval">${v('creds')}</span>` : `<span class="blank">[credentials]</span>`;
+  const addr = fill(v('address'),'Address');
+  const phone = fill(v('phone'),'Phone');
+  const fees = fill(v('fees'),'your program fees');
+
+  let s7 = '';
+  if (st.section7){
+    const physNote = mid ? '' : `<div class="statebox" style="border-left:5px solid #E0A526;background:#FFF8E7"><b>For physicians (${lic}):</b> you have independent practice authority, so the practice-authority items below don't gate you personally. They're included because they govern any NP or PA you supervise or collaborate with — use this as your reference for overseeing them, alongside your own Board of Medicine rules.</div>`;
+    const src = st.sources ? `<p style="font-size:12px;color:#666"><b>Authorities &amp; sources:</b> ${st.sources}</p>` : '';
+    s7 = `<h2>Section 7 — State Regulatory Overlay (${v('state')})</h2>
+        <div class="disc">Applies to APRNs, PAs, and supervising physicians. State content researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and believed current. Regulations change — <b>always confirm with your state medical/nursing board and your own medico-legal counsel before use.</b></div>
+        ${physNote}
+        ${st.section7}
+        <h3>7.x — National caveat</h3>
+        <p>The FDA/compounding status of specific peptides is federal, changes over time, and applies in every state. Confirm each peptide's current availability before building it into the program.</p>
+        ${src}`;
+  } else {
+    s7 = `<h2>Section 7 — State Regulatory Overlay</h2>
+      <div class="statebox"><b>${v('state')} — state specifics not yet built.</b> Your state's practice-authority, consent, sourcing, and telehealth rules should be confirmed with your own counsel. (Practiced.Health is adding states on an ongoing basis.)</div>`;
+  }
+
+  document.getElementById('doc').innerHTML = `
+    <div class="subtitle">COMPLIANCE-READY PEPTIDE PROGRAM · STATE-SPECIFIC</div>
+    <h1>Clinical program tools for ${clinic}</h1>
+    <div class="brandline">A Practiced.Health resource for licensed practitioners · Provider: ${prov}, ${creds} · ${addr} · ${phone}</div>
+    <div class="disc"><b>Not legal advice.</b> Educational/operational template. Have this reviewed by your own medico-legal counsel before clinical use.</div>
+
+    <h2>Section 1 — Provider Program Workflow</h2>
+    <p>The end-to-end sequence for taking a patient from inquiry to an active, monitored peptide program. Each step maps to a section in this packet.</p>
+    <p><b>1. Screen &amp; qualify.</b> Patient completes the Intake &amp; Safety Screen (Sec. 2). Review the safety screen before anything else — malignancy is a hard stop for angiogenic and growth-hormone-secretagogue peptides until addressed; pregnancy or trying-to-conceive is a hold; note autoimmune status, active infection, and overall reactivity, which drive starting dose.</p>
+    <p><b>2. Consult &amp; consent.</b> Discuss the patient's goals, the mechanism and evidence tier of the proposed peptide(s), realistic expectations, and cost. The patient signs the Informed Consent (Sec. 3) before the first prescription. File the signed consent in the record.</p>
+    <p><b>3. Baseline labs.</b> Order the baseline panel matched to the peptide class (Sec. 5). Do not start an angiogenic or GH peptide until the malignancy screen is addressed and, where indicated, baseline IGF-1 is drawn.</p>
+    <p><b>4. Prescribe &amp; obtain the agent.</b> Prescribe and source the peptide — compounded, or from another lawful professional-use/investigational source. Document the agent, source, and lot in the record for every dispense.</p>
+    <p><b>5. Teach administration.</b> Teach reconstitution, injection technique, storage, and timing. GH secretagogues require a minimum 2-hour fast before injection — fasting matters more than daily frequency. Confirm the patient can demonstrate the technique or has support to do so.</p>
+    <p><b>6. Follow up &amp; monitor.</b> Follow the monitoring schedule in Sec. 5. Reassess response and tolerance, repeat class-specific labs, and document every visit (Sec. 6).</p>
+    <p><b>7. Cycle, adjust, or stop.</b> Titrate by response, not by the calendar. Hold at the lowest effective dose. Use peptide holidays where indicated (e.g., declining VEGF on BPC-157/TB-500). Stop for any safety signal or new contraindication.</p>
+
+    <h2>Section 2 — Patient Intake &amp; Safety Screen</h2>
+    <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds} &nbsp; <b>Date:</b> _________</p>
+    <p><b>Patient name:</b> ____________________ &nbsp; <b>DOB:</b> _________ &nbsp; <b>Sex:</b> ______ &nbsp; <b>Phone:</b> __________ &nbsp; <b>Email:</b> __________</p>
+    <h3>A. Your goals</h3>
+    <p><b>Primary goal for peptide therapy (in your words):</b> ______________________________________________</p>
+    <p><b>What have you already tried for this, and how did it go?</b> ______________________________________________</p>
+    <p><b>What does success look like for you in 3 months?</b> ______________________________________________</p>
+    <h3>B. Medical history — check all that apply</h3>
+    <p><span class="ck">☐</span> Cancer / malignancy (current or past) <b>— safety-critical</b> · <span class="ck">☐</span> Pregnant, breastfeeding, or trying to conceive <b>— safety-critical</b> · <span class="ck">☐</span> Active or recent infection · <span class="ck">☐</span> Autoimmune condition · <span class="ck">☐</span> Cardiovascular disease · <span class="ck">☐</span> Diabetes / insulin resistance · <span class="ck">☐</span> Thyroid disorder · <span class="ck">☐</span> Kidney or liver disease · <span class="ck">☐</span> Mold / CIRS · <span class="ck">☐</span> Tick-borne illness · <span class="ck">☐</span> Mental health condition · <span class="ck">☐</span> Bleeding or clotting disorder · <span class="ck">☐</span> Prior organ transplant</p>
+    <p><b>If you checked cancer/malignancy — type, date, and current status:</b> ______________________________________________</p>
+    <p><b>Any surgeries or major diagnoses not listed above:</b> ______________________________________________</p>
+    <h3>C. Medications, supplements &amp; allergies</h3>
+    <p><b>Current prescription medications (name &amp; dose):</b> ______________________________________________</p>
+    <p><b>Supplements / OTC / hormones:</b> ______________________________________________</p>
+    <p><b>Prior or current peptide use (which, dose, response, side effects):</b> ______________________________________________</p>
+    <p><b>Allergies / prior reactions to medications or injections:</b> ______________________________________________</p>
+    <h3>D. Reactivity &amp; sensitivity (this drives your starting dose)</h3>
+    <p><b>In general, I:</b> <span class="ck">☐</span> tolerate most medications well · <span class="ck">☐</span> am moderately sensitive · <span class="ck">☐</span> react to almost everything / very sensitive</p>
+    <p><b>History of strong reactions to new supplements, medications, or detox?</b> <span class="ck">☐</span> No · <span class="ck">☐</span> Yes — describe: __________</p>
+    <h3>E. Brief review of systems — check anything current</h3>
+    <p><span class="ck">☐</span> Fatigue · <span class="ck">☐</span> Poor sleep · <span class="ck">☐</span> Brain fog / memory · <span class="ck">☐</span> Mood changes · <span class="ck">☐</span> Joint / muscle pain · <span class="ck">☐</span> Slow recovery / injury · <span class="ck">☐</span> GI symptoms · <span class="ck">☐</span> Weight changes · <span class="ck">☐</span> Low libido / sexual health · <span class="ck">☐</span> Skin / hair changes · <span class="ck">☐</span> Frequent illness / immune</p>
+    <h3>F. Provider safety screen — provider completes &amp; initials</h3>
+    <p>___ Malignancy history reviewed; angiogenic/GH peptides not started until addressed (screen, surveillance, or clearance as indicated).</p>
+    <p>___ Pregnancy / TTC status confirmed; peptides held if pregnant, breastfeeding, or actively trying.</p>
+    <p>___ Drug/supplement interactions reviewed against the proposed peptide(s).</p>
+    <p>___ Reactivity noted; start-low plan documented for sensitive patients.</p>
+    <p>___ Mold/CIRS and tick-borne status noted; gut-barrier/sequencing considerations flagged if relevant.</p>
+    <p>___ Baseline labs ordered appropriate to the peptide class (Sec. 5).</p>
+    <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+
+    <h2>Section 3 — Informed Consent (CAM / Peptide Therapy)</h2>
+    <p><b>Practice/Clinic:</b> ${clinic} &nbsp; <b>Treating Provider:</b> ${prov}, ${creds}</p>
+    <p><b>Patient Name:</b> ____________________ &nbsp; <b>DOB:</b> _________ &nbsp; <b>Date:</b> _________</p>
+    <p>This Consent describes the treatment plan, anticipated laboratory/diagnostic testing, potential benefits, and possible risks of the peptide/CAM treatment being offered. Take your time, read it carefully, and ask any questions. When your questions are answered to your satisfaction, you will be asked to sign. Do not allow yourself to be pressured. You may withdraw your consent at any time.</p>
+    <p>Your provider will review this Consent with you in detail and keep it in your medical record. The provider is responsible for maintaining an accurate, complete record, including documentation of this discussion and of any off-label or CAM treatment.</p>
+    <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+
+    <h3>Conditions/diagnoses for which treatment is offered (check all)</h3>
+    <p><span class="ck">☐</span> Lifestyle &amp; Preventative · <span class="ck">☐</span> Metabolic &amp; Cardiovascular · <span class="ck">☐</span> GI &amp; Microbiome · <span class="ck">☐</span> Mental Health &amp; Stress · <span class="ck">☐</span> Tick-Borne Illness · <span class="ck">☐</span> Infectious Disease · <span class="ck">☐</span> Detoxification &amp; Environmental · <span class="ck">☐</span> Endocrine &amp; Hormonal · <span class="ck">☐</span> Immune &amp; Inflammatory · <span class="ck">☐</span> Neurological &amp; Cognitive · <span class="ck">☐</span> Other: _______</p>
+
+    <h3>Treatment(s) offered (check all)</h3>
+    <p><span class="ck">☐</span> Peptide therapy · <span class="ck">☐</span> Cellular-derived biologics · <span class="ck">☐</span> IV nutrient therapy · <span class="ck">☐</span> Hormone optimization/BHRT · <span class="ck">☐</span> Functional/advanced lab testing · <span class="ck">☐</span> Other: _______</p>
+
+    <h3>Peptide Therapy Benefits Menu — goals discussed (potential goals, not guarantees)</h3>
+    <p><span class="ck">☐</span> Tissue repair &amp; recovery · <span class="ck">☐</span> Gut &amp; GI barrier · <span class="ck">☐</span> Immune support · <span class="ck">☐</span> Metabolic &amp; weight · <span class="ck">☐</span> Energy &amp; mitochondrial · <span class="ck">☐</span> Cognitive &amp; mood · <span class="ck">☐</span> Sleep · <span class="ck">☐</span> Skin, hair &amp; aesthetic · <span class="ck">☐</span> Sexual health &amp; libido · <span class="ck">☐</span> Longevity &amp; healthy aging · <span class="ck">☐</span> Other: _______</p>
+
+    <h3>1. Assessment — provider &amp; patient initial each line ("N/A" if not applicable)</h3>
+    <p>___ Conventional methods of diagnosis and nonconventional methods were described.</p>
+    <p>___ An appropriate medical history and physical examination was completed.</p>
+    <p>___ Conventional treatment options were discussed, with referral input if needed.</p>
+    <p>___ Any prior conventional treatments and their outcomes were obtained (including whether the patient declined conventional options).</p>
+    <p>___ It was assessed whether this therapy could interfere with any other ongoing or recommended treatment.</p>
+    <p>___ A good-faith prior examination of the patient was performed.</p>
+
+    <h3>2. Disclosure — discussed in detail; all questions answered; initial each line</h3>
+    <p>___ The objectives / expected outcomes / goals (e.g., functional improvement, recovery, symptom relief, or well-being).</p>
+    <p>___ The risks and benefits of the proposed treatment.</p>
+    <p>___ The extent it could interfere with ongoing/recommended care.</p>
+    <p>___ A plain-language description of the mechanism / therapeutic basis.</p>
+    <p>___ Whether an agent used is: (a) FDA-approved for human use; (b) exempt from FDA preapproval under DSHEA (a supplement); or (c) a pharmaceutical compound not commercially available and subject to clinical investigation standards (covers compounded and investigational peptides, including professional-use agents not from a compounding pharmacy).</p>
+    <p>___ An individualized, documented treatment plan considering history, records, exam, and need for further testing/consults/referrals.</p>
+    <p>___ The favorable risk/benefit compared to other treatments for the same condition.</p>
+    <p>___ A reasonable expectation of a favorable outcome, including prevention.</p>
+    <p>___ The expectation of greater benefit than no treatment.</p>
+    <p>___ The provider's education, experience, and credentials in this therapy were disclosed.</p>
+    <p>___ Periodic review at reasonable intervals will consider (a) the patient's progress and (b) new information about the cause of the complaint.</p>
+
+    <h3>3. Patient acknowledgment</h3>
+    <p><span class="ck">☐</span> I have read this form (or had it read to me) and had all my questions answered.</p>
+    <p><span class="ck">☐</span> I understand the therapy may not be FDA-approved for this use and may be compounded or investigational.</p>
+    <p><span class="ck">☐</span> I understand no specific result is guaranteed.</p>
+    <p><span class="ck">☐</span> I understand this treatment will not delay appropriate conventional diagnosis or care.</p>
+    <p><span class="ck">☐</span> My consent is voluntary and I may withdraw it at any time.</p>
+    <p><b>Patient printed name:</b> ____________________</p>
+    <p><b>Patient signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+    <p><b>Witness (if used):</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+    ${st.consentCompliance}
+
+    <h2>Section 4 — Patient Conversation Script + FAQ</h2>
+    <p>A guide the provider can follow in the consult, plus ready answers to the questions patients actually ask. Written to be said out loud.</p>
+    <h3>Opening — start with the goal</h3>
+    <p>"Let's start with what you're hoping to feel or fix. Peptides work best when they're aimed at a specific goal — recovery, energy, gut health, sleep — rather than taken as a general tonic. So tell me what's going on and what a good result would look like for you."</p>
+    <h3>What peptides are</h3>
+    <p>"Peptides are short chains of amino acids — the same building blocks your body already uses to signal itself. A peptide therapy is essentially a targeted signal: it tells a specific system to do more of what it's designed to do — repair tissue, calm inflammation, support the gut lining, or nudge your own growth-hormone rhythm. They're not hormones you're replacing wholesale, and they're not stimulants."</p>
+    <h3>Honesty about the evidence</h3>
+    <p>"I want to be straight with you about the science. Some of these have solid human data behind them; others are promising but still early, and a few are used based on strong mechanism and clinical experience rather than large trials. I'll always tell you which tier we're in for what I'm recommending, because you deserve to make an informed choice — not a hyped one."</p>
+    <h3>Safety</h3>
+    <p>"Safety comes first, and that's why the intake matters. A few things are hard stops for certain peptides — an active or recent cancer for the ones that can promote blood-vessel or tissue growth, and pregnancy. We start low, especially if you're someone who reacts to things, and we adjust based on how you respond, not on a fixed schedule."</p>
+    <h3>What to expect</h3>
+    <p>"This isn't usually an overnight switch. Depending on the peptide and the goal, most people notice changes over a few weeks. We'll set a check-in, look at how you're doing and at your labs, and decide together whether to hold, adjust, or move on. If something isn't earning its place, we stop it."</p>
+    <h3>Cost</h3>
+    <p>"Here's what the program runs and what's included: ${fees}. I'd rather you understand exactly what you're paying for than be surprised, so ask me anything about it."</p>
+    <h3>FAQ — ready answers</h3>
+    <p><b>"Are these FDA-approved?"</b> "Some are; many are prescribed as compounded or investigational agents that aren't FDA-approved for this specific use. That's disclosed in your consent, and it's a normal part of this field — but you should know it, and now you do."</p>
+    <p><b>"Are they safe?"</b> "For the right person, screened properly, they have a good safety profile. The risks come from skipping the screen — which is exactly why we don't skip it. I'll tell you the specific risks for what we choose."</p>
+    <p><b>"How long until I feel something?"</b> "Usually a few weeks. Recovery and gut peptides can be faster; growth-hormone-type and longevity peptides are slower and more cumulative."</p>
+    <p><b>"Are there side effects?"</b> "Most are mild — injection-site reactions, temporary water retention, or a flush. I'll go over what's expected versus what should prompt a call."</p>
+    <p><b>"What if it doesn't work?"</b> "Then we don't keep paying for it. We reassess at your check-in and change course. Titrating by response means we're always testing whether it's actually helping you."</p>
+    <p><b>"Do I have to inject myself?"</b> "Most are small subcutaneous injections with a tiny needle, and I'll teach you until you're comfortable. Some options are capsules or nasal — we'll pick what fits you."</p>
+
+    <h2>Section 5 — Follow-up &amp; Monitoring</h2>
+    <p>The labs to draw and the schedule to follow, by peptide class. Dose decisions are driven by the patient's response, not the calendar.</p>
+    <h3>Baseline — before starting (all patients)</h3>
+    <p>CBC with differential, CMP, HbA1c with fasting insulin, fasting lipid panel, hs-CRP. Add class-specific baselines below. Address malignancy screening before any angiogenic/GH peptide.</p>
+    <h3>Class-specific baseline &amp; monitoring</h3>
+    <p><b>Growth-hormone secretagogues</b> (CJC-1295/Ipamorelin, Sermorelin, MK-677-type): baseline and follow-up IGF-1; watch fasting glucose/insulin; enforce the ≥2-hour fast before dosing. Reassess IGF-1 at 6–8 weeks and keep it age-appropriate — not supraphysiologic.</p>
+    <p><b>Angiogenic / tissue-repair</b> (BPC-157, TB-500): malignancy screen addressed before starting; consider baseline and trend VEGF. If VEGF declines on therapy, consider a peptide holiday. Track the injury/recovery target directly.</p>
+    <p><b>Metabolic / weight</b> (tirzepatide, retatrutide, AOD-9604, MOTS-c): fasting insulin, HbA1c, weight, waist; titrate by response to the lowest effective dose — never auto-advance on a label schedule. Monitor GI tolerance. (Semaglutide is excluded from this practice.)</p>
+    <p><b>Immune / thymic</b> (Thymosin Alpha-1, Thymalin): track the immune indication and relevant markers per case; note T-cell polarization if an immune panel is available (TH1 support before Tregs in TH2-dominant/chronic illness).</p>
+    <p><b>Mitochondrial</b> (SS-31/MOTS-c): track energy/functional endpoints; SS-31 works at the cardiolipin level and its ceiling is limited by mitochondrial linoleic-acid availability.</p>
+    <p><b>Gut / barrier</b> (KPV, larazotide, BPC-157): in mold/CIRS, restore the gut barrier first before layering systemic peptides; track GI symptoms and relevant stool markers.</p>
+    <h3>Follow-up schedule</h3>
+    <p><b>4–6 weeks:</b> response and tolerance; repeat class-specific labs; adjust dose by response. <b>3 months:</b> reassess against the original goal; VEGF check on angiogenic peptides; decide hold/adjust/holiday/stop. <b>Ongoing every 3–6 months:</b> periodic labs, reconfirm goals, re-screen safety (especially malignancy surveillance where relevant).</p>
+    <h3>Hold / stop criteria</h3>
+    <p>New malignancy or suspicious finding (angiogenic/GH); pregnancy; supraphysiologic IGF-1; intolerable side effects; no meaningful benefit at an adequate trial; any new contraindication. Document the reason and the plan.</p>
+
+    <h2>Section 6 — Per-Visit Documentation (SOAP)</h2>
+    <p>A fill-in SOAP note structured for peptide therapy, plus the compliance checklist that should be true at every visit.</p>
+    <p><b>Date:</b> _________ &nbsp; <b>Patient:</b> ____________________ &nbsp; <b>Provider:</b> ____________________ &nbsp; <b>Visit #:</b> ____</p>
+    <h3>S — Subjective</h3>
+    <p>Progress toward stated goal; symptom changes since last visit; tolerance and any side effects; adherence, dose, and injection technique; new symptoms or events. ______________________________________________</p>
+    <h3>O — Objective</h3>
+    <p>Vitals; relevant exam; current labs with dates and comparison to baseline; current peptide(s), dose, agent/source/lot. ______________________________________________</p>
+    <h3>A — Assessment</h3>
+    <p>Response to date (improving / stable / no benefit); tolerance; safety status reconfirmed (malignancy/pregnancy where applicable); risk/benefit still favorable. ______________________________________________</p>
+    <h3>P — Plan</h3>
+    <p>Continue / titrate / hold / holiday / stop — by response, not calendar; dose change and rationale; labs ordered; next follow-up; patient education given. ______________________________________________</p>
+    <h3>Per-visit compliance checklist</h3>
+    <p><span class="ck">☐</span> Signed consent current on file · <span class="ck">☐</span> Safety/malignancy reconfirmed if applicable · <span class="ck">☐</span> Agent, source, and lot documented · <span class="ck">☐</span> Dose changes and rationale recorded · <span class="ck">☐</span> Provider signature + date</p>
+    <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
+
+    ${s7}
+
+    <div class="statebox"><b>Regulatory currency.</b> The state-specific regulatory and consent content in this packet was researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and is believed up to date. Rules change — before using this program, confirm current requirements with your <b>state medical/nursing board</b> and your own <b>medico-legal counsel</b>.</div>
+
+    <h2>Master Disclaimer</h2>
+    <p style="font-size:12px;color:#666"><i>Educational/operational template from Practiced.Health. Not legal advice; establishes no collaborative, supervisory, or employment relationship. The purchasing provider is solely responsible for clinical decisions, prescribing, patient safety, consent, and compliance with all federal and state laws. Have this reviewed by your own medico-legal counsel before clinical use. State content reflects research current as of the delivery date and may change.</i></p>
+  `;
+}
+
+// ---------- ACCESS GATE ----------
+document.getElementById('signinLink').onclick = () => { try{ localStorage.setItem('pp_after_signin','/builder'); }catch(e){} location.href = '/'; };
+function unlock(){ document.getElementById('lock').style.display = 'none'; }
+function setOffer(kind){   // 'addon' (library member) or 'standalone'
+  document.getElementById('lockPrice').textContent = (kind === 'addon') ? PRICE_ADDON : PRICE_STANDALONE;
+  document.getElementById('unlockBtn').href = (kind === 'addon') ? UNLOCK_URL_ADDON : UNLOCK_URL_STANDALONE;
+}
+setOffer('standalone');   // default for a new visitor
+async function checkAccess(){
+  const q = new URLSearchParams(location.search);
+  if (q.get('preview') === 'unlocked'){ unlock(); return; }
+  const token = localStorage.getItem('pp_lic_token');
+  if (!token){ document.getElementById('lockMsg').textContent = 'New here? Purchase below. Already bought it? Sign in.'; return; }
+  try {
+    const r = await fetch('/api/builder-access', { headers: { Authorization: 'Bearer ' + token } });
+    const d = await r.json().catch(()=>({}));
+    if (r.ok && d.entitled){ unlock(); return; }
+    if (d.member){ setOffer('addon'); document.getElementById('lockMsg').textContent = 'Add it to your membership below.'; }
+    else { setOffer('standalone'); }
+  } catch(e){ document.getElementById('lockMsg').textContent = 'Could not verify access — please try again.'; }
+}
+
+// Manual "Update document" button — deterministic push, with a brief confirmation flash.
+function applyChanges(){
+  render();
+  var b = document.getElementById('applyBtn');
+  if (b){ var t = b.textContent; b.textContent = 'Updated ✓'; b.style.background = '#2D6A2D';
+    setTimeout(function(){ b.textContent = t; b.style.background = '#1F3A5F'; }, 1200); }
+}
+
+// Live-update the packet as the user types in any field (input + change for mobile robustness).
+['clinic','address','phone','email','provider','creds','fees','model','license','state'].forEach(function(id){
+  var el = document.getElementById(id);
+  if (el){ el.addEventListener('input', render); el.addEventListener('change', render); }
+});
+
+render();
+checkAccess();
+</script>
+</body></html>
