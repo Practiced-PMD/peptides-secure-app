@@ -324,7 +324,7 @@ function setOffer(kind){   // 'addon' (library member) or 'standalone'
 setOffer('standalone');   // default for a new visitor
 async function checkAccess(){
   const q = new URLSearchParams(location.search);
-  if (q.get('preview') === 'unlocked'){ unlock(); return; }
+
   const token = localStorage.getItem('pp_lic_token');
   if (!token){ document.getElementById('lockMsg').textContent = 'New here? Purchase below. Already bought it? Sign in.'; return; }
   try {
