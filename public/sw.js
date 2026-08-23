@@ -1,6 +1,6 @@
 // Service worker: caches the app shell so it installs and works offline.
 // Locked section bodies are fetched at runtime from /api/get-content (never precached here).
-const CACHE = 'peptides-practiced-v24';
+const CACHE = 'peptides-practiced-v26';
 const ASSETS = [
   './',
   './index.html',
