@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Compliance-Ready Peptide Program — Practiced.Health</title>
 <style>
   :root{--navy:#1F3A5F;--navy2:#16293f;--teal:#2E7D8A;--mint:#8fe3d3;--amber:#BF8F00;
@@ -8,7 +8,7 @@
     --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --serif:'Fraunces',Georgia,serif;}
   *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.55;padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.55}
   header{background:linear-gradient(135deg,var(--navy2),var(--teal));color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
   header .brand{display:flex;align-items:center;gap:12px}
   header .mk{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:600;font-size:22px}
@@ -113,7 +113,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
         <option value="MD">Physician (MD)</option>
         <option value="DO">Physician (DO)</option>
       </select>
-      <div class="hint">NP/PA → state regulatory section included. MD/DO → omitted.</div></div>
+      <div class="hint">State regulatory section is included for all license types. Physicians also see it — as the reference for NPs/PAs they supervise.</div></div>
     <div class="fld"><label>Practice model</label>
       <select id="model"><option>Independent</option><option>Collaborative / supervised</option><option>Group practice</option></select></div>
     <h2>State &amp; tier</h2>
@@ -121,7 +121,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
       <select id="state" onchange="render()"></select>
       <div class="hint">Built states load their specific wording; others use the general note until built.</div></div>
     <div class="fld"><label>Program fees (optional)</label><input id="fees" placeholder="e.g., $X / month"></div>
-    <div class="hint" style="margin-top:14px">Fill any field — the packet updates live. Then Print / Save PDF.</div>
+    <button type="button" id="applyBtn" onclick="applyChanges()" style="width:100%;margin-top:14px;background:#1F3A5F;color:#fff;border:none;font-weight:700;font-size:15px;padding:13px 16px;border-radius:9px;cursor:pointer">Update document →</button>
+    <div class="hint" style="margin-top:10px">The packet updates as you type. If any change doesn't show, click <b>Update document</b> to push everything over. Then Print / Save PDF.</div>
   </div>
   <div class="preview"><div class="doc" id="doc"></div></div>
 </div>
@@ -152,7 +153,8 @@ const STATES_BUILT = {
       <h3>7.2 — Sourcing</h3>
       <p>Peptides may be compounded <b>or</b> obtained from another lawful professional-use/investigational source (e.g., Thymalin). Do not assume a compounding pharmacy is the only channel; confirm each agent's current legal availability.</p>
       <h3>7.3 — Telehealth (if used)</h3>
-      <p>Louisiana's rules for establishing the provider-patient relationship and any exam requirement before prescribing apply. <i>Verify current Louisiana telehealth-prescribing rules with counsel.</i></p>`
+      <p>Louisiana's rules for establishing the provider-patient relationship and any exam requirement before prescribing apply. <i>Verify current Louisiana telehealth-prescribing rules with counsel.</i></p>`,
+    sources: `Louisiana State Board of Nursing (lsbn.state.la.us); Louisiana State Board of Medical Examiners (lsbme.la.gov) for physicians and physician assistants; Louisiana Board of Pharmacy.`
   },
   "Texas": {
     consentCompliance: `<div class="statebox"><b>Texas compliance statement:</b> This form complies with the disclosure requirements in Texas Administrative Code, Title 22, Part 9, Chapter 171, §171.2 (Complementary and Alternative Medicine). The treating provider has made the required disclosures, discussed conventional and nonconventional options, and documented consent in the medical record. <i>Verify current requirements with your own Texas counsel.</i></div>`,
@@ -162,7 +164,8 @@ const STATES_BUILT = {
       <h3>7.2 — Consent</h3>
       <p>Texas requires the CAM disclosure/consent under 22 TAC §171.2 (built into the consent above). Keep the signed form in the record.</p>
       <h3>7.3 — Sourcing</h3>
-      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability.</p>`
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability.</p>`,
+    sources: `Texas Board of Nursing (bon.texas.gov); Texas Medical Board (tmb.texas.gov) — incl. 22 TAC § 171.2 (CAM) and PA rules; Texas State Board of Pharmacy.`
   },
   "California": {
     consentCompliance: `<div class="statebox"><b>California:</b> This therapy is offered as complementary/alternative medicine. Consistent with California Business &amp; Professions Code § 2234.1, the provider conducted a good-faith prior examination, disclosed conventional treatment options and the provider's education, experience, and credentials in this therapy, and obtained the patient's informed consent. <i>Verify current requirements with your own California counsel.</i></div>`,
@@ -174,7 +177,138 @@ const STATES_BUILT = {
       <h3>7.3 — Sourcing</h3>
       <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability and any California Board of Pharmacy office-use requirements.</p>
       <h3>7.4 — Telehealth (if used)</h3>
-      <p>California expects a <b>good-faith prior examination</b> and the in-person standard of care before prescribing. <i>Confirm current California telehealth-prescribing rules.</i></p>`
+      <p>California expects a <b>good-faith prior examination</b> and the in-person standard of care before prescribing. <i>Confirm current California telehealth-prescribing rules.</i></p>`,
+    sources: `California Board of Registered Nursing — AB 890 (rn.ca.gov/practice/ab890); Medical Board of California (mbc.ca.gov) for physicians and physician assistants; California Business &amp; Professions Code § 2234.1; California State Board of Pharmacy.`
+  },
+  "Florida": {
+    consentCompliance: `<div class="statebox"><b>Florida:</b> This therapy is offered as a complementary or alternative health care treatment under Florida Statute § 456.41. Consistent with that statute, the provider has informed the patient of the nature of the treatment and its benefits and risks, disclosed the provider's education, experience, and credentials in this therapy, obtained the patient's informed consent, and documented in the record how these requirements were met. <i>Verify current requirements with your own Florida counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA)</h3>
+      <p>Florida APRNs practice either under a written <b>protocol/supervisory relationship with a physician</b> (traditional) or, if registered under <b>Fla. Stat. § 464.0123</b> after <b>≥3,000 clinical practice hours in the preceding 5 years</b>, as an <b>autonomous APRN</b> — but autonomous practice is statutorily <b>limited to primary care</b> (family medicine, general pediatrics, general internal medicine). A peptide/regenerative-wellness program may sit outside that primary-care box, so an autonomous APRN should confirm scope or maintain the appropriate physician relationship for it. <b>PAs</b> practice under physician supervision (Fla. Stat. § 458.347). Autonomous registration does not expand controlled-substance authority — most peptides aren't scheduled; confirm each agent.</p>
+      <h3>7.2 — Consent (shapes the consent above) — Fla. Stat. § 456.41</h3>
+      <p>Florida's CAM statute applies to <b>all licensed health care practitioners — APRNs, PAs, and physicians alike</b>. Before providing a CAM treatment, inform the patient of the nature of the treatment and its benefits and risks, disclose the provider's education, experience, and credentials in that therapy, and document in the record how those requirements were met. All of this is built into the consent above.</p>
+      <h3>7.3 — Sourcing</h3>
+      <p>Peptides may be compounded <b>or</b> from another lawful professional-use/investigational source. Confirm each agent's current legal availability and any Florida Board of Pharmacy office-use/compounding requirements.</p>
+      <h3>7.4 — Telehealth (if used) — Fla. Stat. § 456.47</h3>
+      <p>Florida permits establishing the practitioner–patient relationship and prescribing via telehealth if the evaluation is sufficient to diagnose and treat and meets the prevailing standard of care; a physical exam is not strictly required. Schedule II controlled substances are restricted via telehealth (narrow exceptions). <i>Confirm current Florida telehealth-prescribing rules.</i></p>`,
+    sources: `Florida Board of Nursing (floridasnursing.gov); Florida Board of Medicine (flboardofmedicine.gov) for physicians and physician assistants; Fla. Stat. § 464.0123 (autonomous APRN), § 456.41 (CAM treatments), § 456.47 (telehealth), § 458.347 (PAs); Florida Board of Pharmacy.`
+  },
+  "New York": {
+    consentCompliance: `<div class="statebox"><b>New York:</b> This therapy is offered as non-conventional care consistent with New York Education Law § 6527(4)(e). The provider has explained the nature of the treatment, its benefits and risks, and the basis for expecting it to effectively address the patient's condition; disclosed the provider's education, experience, and credentials in this therapy; obtained the patient's informed consent; and documented the clinical rationale in the record. <i>Verify current requirements — including New York's patient-specific compounding/dispensing rules — with your own New York counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners</b> follow an experience tier: an NP with <b>more than 3,600 hours</b> of qualifying practice may practice <b>independently — no written collaborative agreement</b> (the NP Modernization Act replaced it with a duty to maintain collaborative relationships); an NP with <b>3,600 hours or fewer</b> practices under written practice protocols and a written practice agreement with a collaborating physician. <b>PAs</b> practice under physician supervision; an experienced PA with <b>more than 8,000 hours</b> may practice without supervision in primary-care fields or with hospital/health-system privileges (note the primary-care limitation). <b>Physicians (MD/DO)</b> have independent authority.</p>
+      <h3>7.2 — Consent — Education Law § 6527(4)(e)</h3>
+      <p>New York has <b>no dedicated CAM-consent statute</b>. It protects a practitioner's "use of whatever medical care, conventional or non-conventional, which <b>effectively treats</b>" the condition (§ 6527(4)(e); non-conventional treatment defined at § 6531; 8 NYCRR § 29.2). Because the protection turns on the treatment effectively treating the condition, <b>document the clinical rationale, expected benefit, and monitoring</b>. The consent above already captures the required elements; New York adds no consent-form requirement.</p>
+      <h3>7.3 — Sourcing — the New York gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>New York restricts office-stock compounding — the channel determines legality.</b> A traditional <b>503A compounding pharmacy may not prepare office-stock/office-use sterile compounds without a patient-specific prescription</b> (New York restricted sterile office-stock compounding even before the federal DQSA — 8 NYCRR §§ 29.1–29.2; Education Law Article 137). Office vials for in-office administration must instead come from a <b>503B outsourcing facility</b>, federally registered to make office-stock sterile products — if the specific peptide is available from one. <b>Bottom line: 503A = patient-specific prescription; office stock = 503B outsourcing facility.</b> Confirm each peptide's 503B availability and current NY Board of Pharmacy requirements before relying on office vials.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>New York permits telehealth (Public Health Law Article 29-G) with a valid practitioner–patient relationship and the in-person standard of care. <i>Confirm current New York telehealth-prescribing rules.</i></p>`,
+    sources: `New York State Education Department, Office of the Professions — Nursing / Medicine / Physician Assistants / Pharmacy (op.nysed.gov); New York State Board for Medicine; NY Education Law §§ 6527(4)(e), 6531, 6542, 6810, 6902 and Article 137 (Pharmacy); 8 NYCRR §§ 29.1–29.2; NY Public Health Law Article 29-G (telehealth); federal 503A vs. 503B compounding framework (FDCA §§ 503A, 503B).`
+  },
+  "Georgia": {
+    consentCompliance: `<div class="statebox"><b>Georgia:</b> This therapy is offered as complementary/alternative care. Consistent with Georgia's informed-consent law (O.C.G.A. § 31-9-6.1) and the Georgia Composite Medical Board's professional standards, the provider has disclosed the nature of the treatment, its risks and benefits, reasonable alternatives, and the provider's education, experience, and credentials in this therapy, obtained the patient's informed consent, and documented the clinical rationale in the record. <i>Verify current requirements — including Georgia's office-use compounding rules and your nurse protocol agreement — with your own Georgia counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners / APRNs:</b> Georgia does <b>not</b> allow independent APRN practice. An APRN prescribes and orders only under a <b>written nurse protocol agreement with a delegating physician</b> (O.C.G.A. § 43-34-25) — comparable specialty, immediate consultation, documented parameters (refills, diagnostics, imaging), periodic physician review, reviewed/updated annually; no Schedule I/II (narrow emergency-opioid exception); ≤8 combined APRNs/PAs per physician. <b>PAs</b> practice under a board-approved physician job description/delegation (§ 43-34-103). <b>Physicians (MD/DO)</b> have independent authority. An established practice already has its protocol/delegation — confirm it authorizes the peptide drug categories prescribed.</p>
+      <h3>7.2 — Consent (no dedicated CAM-consent statute)</h3>
+      <p>Georgia has <b>no CAM-specific consent statute</b>. Rely on Georgia's general informed-consent law (O.C.G.A. § 31-9-6.1) and the Composite Medical Board's professional-conduct standards (Ga. Comp. R. & Regs. 360-3-.02). Document the clinical rationale, risks/benefits, alternatives, and provider credentials — all captured in the consent above.</p>
+      <h3>7.3 — Sourcing — the Georgia gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>Georgia limits office-use compounding to outsourcing facilities.</b> A traditional <b>503A compounding pharmacy may compound only on a patient-specific prescription</b> — it may not supply office-use/office-stock compounds. Office vials for in-office administration must come from a <b>503B outsourcing facility</b> (Ga. Comp. R. & Regs. 480-11-.02; eff. July 1, 2016) — if the specific peptide is available from one. <b>Georgia carve-out:</b> a physician who compounds for their OWN patients, and hospital pharmacies, are exempt. Bottom line: 503A = patient-specific; office stock = 503B facility. Confirm each peptide's 503B availability and current Georgia Board of Pharmacy requirements before relying on office vials.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Georgia's Composite Medical Board telemedicine rules require a documented provider–patient evaluation and the in-person standard of care before prescribing. <i>Confirm current Georgia telemedicine-prescribing rules (Ga. Comp. R. & Regs. 360-3-.07).</i></p>`,
+    sources: `Georgia Composite Medical Board (medicalboard.georgia.gov); Georgia Board of Nursing; Georgia Board of Pharmacy; O.C.G.A. § 43-34-25 (nurse protocol / APRN delegation), § 43-34-103 (physician assistants), § 31-9-6.1 (informed consent); Ga. Comp. R. & Regs. 360-3-.02 (conduct), 360-3-.07 (telemedicine), 480-11-.02 (compounding / office-use); federal 503A vs. 503B compounding framework (FDCA §§ 503A, 503B).`
+  },
+  "Arizona": {
+    consentCompliance: `<div class="statebox"><b>Arizona:</b> This therapy is offered as complementary/alternative care. The provider has disclosed the nature of the treatment, its risks and benefits, reasonable alternatives, and the provider's education, experience, and credentials in this therapy, obtained the patient's informed consent, and documented the clinical rationale in the record. <i>Verify current requirements with your own Arizona counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners (RNPs):</b> Arizona is a <b>full-practice-authority</b> state. An RNP practices <b>independently — no physician supervision or collaboration agreement required</b> (A.R.S. Title 32, Ch. 15; A.A.C. R4-19), and with a DEA registration may independently prescribe, order, administer, and procure <b>Schedule II–V</b> controlled substances. The only standing duty is to refer or consult when the patient's health and welfare require it. Most peptides aren't scheduled — confirm each agent. <b>PAs</b> practice under a collaboration/supervision agreement with a physician (Arizona Regulatory Board of Physician Assistants, A.R.S. Title 32, Ch. 25). <b>Physicians (MD/DO)</b> have independent authority.</p>
+      <h3>7.2 — Consent (no dedicated CAM-consent statute)</h3>
+      <p>Arizona has <b>no CAM-specific consent statute</b> and is generally tolerant of integrative practice. Consent relies on Arizona's general informed-consent standard and the boards' professional-conduct rules. Document the clinical rationale, risks/benefits, alternatives, and provider credentials — all captured in the consent above.</p>
+      <h3>7.3 — Sourcing — favorable in Arizona</h3>
+      <div class="statebox" style="border-left:5px solid #2D6A2D;background:#F0FFF0"><b>Good news: office-use compounding is permitted in Arizona.</b> A pharmacy may compound and provide a product to a practitioner for in-office administration, labeled "Not For Dispensing" / "For Office or Hospital Administration Only" (A.A.C. R4-23-410). The one condition: the pharmacy must first establish a history of compounding that product on valid patient-specific prescriptions before making office-use quantities. So unlike New York and Georgia, an Arizona practice can hold office vials from a traditional compounding pharmacy, not only from a 503B outsourcing facility. Still confirm each peptide's availability and current Arizona Board of Pharmacy requirements.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Arizona is telehealth-friendly (A.R.S. § 36-3602 and related) and permits establishing the relationship and prescribing via telehealth within the standard of care, with some limits on certain controlled substances. <i>Confirm current Arizona telehealth-prescribing rules.</i></p>`,
+    sources: `Arizona State Board of Nursing (azbn.gov); Arizona Medical Board (azmd.gov) and Arizona Board of Osteopathic Examiners; Arizona Regulatory Board of Physician Assistants; Arizona State Board of Pharmacy; A.R.S. Title 32, Ch. 15 (Nursing) and Ch. 25 (Physician Assistants); A.A.C. R4-19 (nursing scope), R4-23-410 (compounding / office-use); A.R.S. § 36-3602 (telehealth); federal 503A vs. 503B compounding framework.`
+  },
+  "North Carolina": {
+    consentCompliance: `<div class="statebox"><b>North Carolina:</b> This therapy is offered as a nontraditional/experimental treatment permitted under N.C. Gen. Stat. § 90-14(a)(6). The provider has disclosed the non-FDA-approved/off-label nature of the treatment, its risks, benefits, and conventional alternatives, obtained the patient's informed consent, and documented the clinical rationale and monitoring in the record. <i>Verify current requirements with your own North Carolina counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners:</b> North Carolina is a <b>restricted-practice</b> state. An NP practices under a <b>supervising physician and a collaborative practice agreement (CPA)</b> jointly overseen by the Board of Nursing and Medical Board (21 NCAC 32M .0104/.0110) — reviewed and re-signed <b>annually</b>, with quality meetings (monthly for the first 6 months, then at least every 6 months). The CPA must enumerate the drugs/devices the NP may use — <b>confirm it covers the peptide categories</b>; for controlled substances the supervising physician must hold the same DEA schedules. There is no experience pathway to independent NP practice. <b>PAs:</b> under HB 67 (2025, "PA Team-Based Practice Act"), a PA with ≥4,000 team-based hours no longer needs a named supervising physician; newer PAs remain supervised. <b>Physicians (MD/DO)</b> are independent.</p>
+      <h3>7.2 — Consent (statutory nonconventional-therapy shield)</h3>
+      <p>North Carolina has no dedicated CAM rule, but <b>N.C. Gen. Stat. § 90-14(a)(6)</b> shields nontraditional/experimental therapy from discipline <b>unless</b> the Board shows it is less safe than prevailing treatment or generally ineffective — so <b>document the rationale, safety, and monitoring</b>. Consent otherwise runs on general (common-law) informed consent plus board conduct rules; the consent above captures the required disclosures.</p>
+      <h3>7.3 — Sourcing — the North Carolina gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>North Carolina's office-use carve-out is narrow.</b> A pharmacy may supply compounded product to a practitioner only for products the practitioner <b>administers in the clinic</b>, and the rule defers to federal law (21 NCAC 46 .2801(c)) — which does not allow a 503A pharmacy to make non-patient-specific office stock. <b>So: take-home vials must be dispensed on a patient-specific 503A prescription; office stock for administration must come from a 503B outsourcing facility.</b> Anticipatory compounds may not be dispensed until a patient-specific prescription is received.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Permitted (NC Medical Board Position Statement 5.1.4), including establishing the relationship without a prior in-person visit if the standard of care is met. Controlled-substance telehealth follows the federal Ryan Haight/DEA framework. <i>Confirm current rules.</i></p>`,
+    sources: `North Carolina Board of Nursing (ncbon.com); North Carolina Medical Board (ncmedboard.org); North Carolina Board of Pharmacy (ncbop.org); 21 NCAC 32M .0104/.0109/.0110 (NP practice/CPA), N.C. Gen. Stat. § 90-14(a)(6) (nonconventional-therapy shield), HB 67 (2025 PA reform), 21 NCAC 46 .2801 (compounding/office-use); federal 503A vs. 503B compounding framework.`
+  },
+  "South Carolina": {
+    consentCompliance: `<div class="statebox"><b>South Carolina:</b> This therapy is offered as complementary/alternative care. The provider has disclosed the non-FDA-approved/investigational nature of the treatment, its risks, benefits, and conventional alternatives, obtained the patient's informed consent, and documented the clinical rationale in the record. <i>Verify current requirements with your own South Carolina counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners:</b> South Carolina is a <b>reduced-practice</b> state — an NP must maintain a <b>written practice agreement with a physician</b> (S.C. Code § 40-33-34), reviewed at least annually and produced to the Board within 72 hours on request; the physician must be readily available for consultation. (Confirm the current physician-to-APRN ratio with the Board.) Controlled substances are allowed if delegated in the agreement, with Schedule II limits. <b>PAs</b> practice under a <b>supervising physician</b> with written scope-of-practice guidelines (§ 40-47-955) — not independent. <b>Physicians (MD/DO)</b> are independent.</p>
+      <h3>7.2 — Consent (no dedicated CAM statute)</h3>
+      <p>South Carolina has <b>no dedicated CAM statute or board rule</b>. Non-conventional therapies are judged against the ordinary standard of care and general informed-consent duty, backed by the conduct rules (§ 40-47-110 physicians; § 40-33-110 nursing). A strong written consent disclosing the non-FDA-approved/investigational status of peptides is the primary protection.</p>
+      <h3>7.3 — Sourcing — office use permitted, but written for "physicians"</h3>
+      <div class="statebox" style="border-left:5px solid #E0A526;background:#FFF8E7"><b>South Carolina allows office-use compounding</b> — a purchaser may order compounded medications for in-office administration and store them (not for resale) without a per-patient prescription (S.C. Code § 40-43-86(CC)(2)(h)). <b>Caveat:</b> the statute names <b>"Physicians,"</b> not "practitioners," so whether an <b>NP-owned</b> practice may order office stock in the NP's own name is unsettled. Practical paths: route office-use orders through the collaborating physician, get a written Board of Pharmacy interpretation, or source sterile office stock from a <b>503B outsourcing facility</b> and use 503A patient-specific compounds for individually prescribed peptides.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Permitted (S.C. Code § 40-47-113) if the standard of care can be met without an in-person exam; PMP and Ryan Haight compliance required. <b>Schedule II-narcotic and III-narcotic prescriptions are not permitted via telemedicine</b> except narrow exceptions — most peptides are unscheduled. <i>Confirm current rules.</i></p>`,
+    sources: `South Carolina Board of Nursing, Board of Medical Examiners, and Board of Pharmacy (llr.sc.gov); S.C. Code § 40-33-34 (NP practice agreement), § 40-33-110 (nursing conduct), § 40-47-955 (PAs), § 40-47-110 (physician conduct), § 40-47-113 (telemedicine), § 40-43-86(CC) (compounding/office-use); federal 503A vs. 503B compounding framework.`
+  },
+  "Tennessee": {
+    consentCompliance: `<div class="statebox"><b>Tennessee:</b> This therapy is offered as an integrative/complementary treatment that is not FDA-approved for this use and is not the conventional standard of care. The provider has disclosed its investigational/off-label nature, the risks, benefits, and conventional alternatives, obtained the patient's informed consent, and documented the clinical rationale in the record. <i>Verify current requirements with your own Tennessee counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners:</b> Tennessee is a <b>restricted-practice</b> state. An APRN with prescriptive authority files a notice naming a <b>collaborating physician</b> who has control and responsibility for prescriptive services (that physician's name must appear on the prescription pad); controlled substances require jointly adopted formulary rules, and remote-site practice triggers mandatory physician chart review (T.C.A. § 63-7-123). <b>PAs</b> practice collaboratively in two tiers since 2024 — non-endorsed (&lt;6,000 hrs) under protocols with heavier chart review; endorsed (≥6,000 hrs) under a lighter collaboration agreement (§ 63-19-106/107). <b>Physicians (MD/DO)</b> are independent.</p>
+      <h3>7.2 — Consent (no safe harbor — actually stricter)</h3>
+      <div class="statebox" style="border-left:5px solid #E0A526;background:#FFF8E7"><b>Tennessee has no CAM safe harbor.</b> Its only CAM-specific board document is a <b>restrictive</b> Board of Medical Examiners position statement on unproven/alternative treatments. Non-conventional therapies are judged against the ordinary standard of care and unprofessional-conduct statutes (§ 63-6-214), with general informed consent (§ 29-26-118). A robust written consent disclosing the non-FDA-approved/off-label status of peptides is the practice's primary risk control.</div>
+      <h3>7.3 — Sourcing — the Tennessee gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>Tennessee provides no open "office-use" compounding pathway.</b> Compounded preparations are treated as requiring a <b>patient-specific</b> order (Rule 1140-03-.03). A pharmacy may transfer drugs to a practitioner for administration only within the narrow <b>5%-of-revenue practitioner-transfer allowance</b>; beyond that it needs wholesale/503B licensure. <b>Default to patient-specific 503A prescriptions or a 503B outsourcing facility for office stock</b>, and confirm the current position directly with the Tennessee Board of Pharmacy.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Permitted (T.C.A. § 63-1-155) with a valid relationship formed by mutual consent/communication and the same standard of care; a documented history/exam/diagnosis is required before prescribing. Pain-management and buprenorphine carve-outs apply; CS follows DEA. <i>Confirm current rules.</i></p>`,
+    sources: `Tennessee Board of Nursing, Board of Medical Examiners, and Board of Pharmacy (tn.gov/health); T.C.A. § 63-7-123 (APRN), § 63-19-106/107 (PAs), § 63-6-214 (physician conduct), § 29-26-118 (informed consent); Tenn. Comp. R. & Regs. 0880-02-.14, 1140-03-.03 (compounding); T.C.A. § 63-1-155 (telehealth); federal 503A vs. 503B compounding framework.`
+  },
+  "Colorado": {
+    consentCompliance: `<div class="statebox"><b>Colorado:</b> This therapy is offered as complementary/alternative care that is not FDA-approved for this use and is prescribed off-label or as an investigational agent. The provider has disclosed the nature of the treatment, its risks, benefits, and conventional alternatives, obtained the patient's informed consent, and documented the clinical rationale in the record. <i>Verify current requirements with your own Colorado counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners:</b> Colorado is a <b>full-practice-authority</b> state — an APRN practices and diagnoses independently, with no supervising/collaborating physician for scope of practice. <b>Prescribing</b> is gated: an APRN first holds provisional prescriptive authority and must complete <b>750 hours of documented prescribing mentorship</b> (C.R.S. § 12-255-112), after which prescriptive authority is full and independent. <b>PAs</b> practice under a <b>collaborative agreement</b> (supervision was repealed), with heavier requirements below ~5,000 hours (C.R.S. § 12-240-114.5). <b>Physicians (MD/DO)</b> are independent.</p>
+      <h3>7.2 — Consent (no CAM safe harbor for licensed providers)</h3>
+      <p>Colorado's alternative-medicine statute (C.R.S. § 6-1-724) applies only to <b>unlicensed</b> practitioners and expressly excludes licensed professionals — an NP/PA practice <b>cannot</b> rely on it. Consent runs on general informed consent plus the conduct rules (§ 12-255-120 nursing; § 12-240-121 medical). Because peptides are largely non-FDA-approved/off-label, disclose that status explicitly — the consent above does.</p>
+      <h3>7.3 — Sourcing — the Colorado gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>Colorado restricts 503A office stock.</b> A 503A compounding pharmacy may compound only on a <b>patient-specific prescription</b> or as limited anticipatory compounding based on documented prescribing history (C.R.S. § 12-280-120; 3 CCR 719-1 Rule 21) — there is no open office-stock mechanism. <b>For true office stock, use a 503B outsourcing facility;</b> otherwise tie each compounded peptide to a patient-specific prescription. Confirm each supplier's status with the Colorado Board of Pharmacy.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Permitted without a prior in-person exam if an appropriate evaluation occurs (C.R.S. § 12-30-108; Medical Board Policy 40-3); questionnaire-only prescribing is below standard. Out-of-state telehealth registrants may not prescribe controlled substances into Colorado (§ 12-30-124); CS follows DEA. <i>Confirm current rules.</i></p>`,
+    sources: `Colorado Board of Nursing, Medical Board, and State Board of Pharmacy (dpo.colorado.gov); C.R.S. § 12-255-112 (APRN/prescriptive authority), § 12-255-120 (nursing conduct), § 12-240-114.5 (PAs), § 12-280-120 (compounding), § 12-30-108/124 (telehealth), § 6-1-724 (unlicensed CAM — N/A to licensed); 3 CCR 719-1 Rule 21; federal 503A vs. 503B compounding framework.`
+  },
+  "Washington": {
+    consentCompliance: `<div class="statebox"><b>Washington:</b> This therapy is offered as a non-traditional/complementary treatment that is not FDA-approved for this use. Consistent with RCW 18.130.180(4), and having disclosed the treatment's risks, benefits, and conventional alternatives under Washington's informed-consent law (RCW 7.70), the provider obtained the patient's informed consent and documented the clinical rationale in the record. <i>Verify current requirements with your own Washington counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners (ARNP/APRN):</b> Washington is a <b>full-practice-authority</b> state — ARNPs practice and prescribe independently, including controlled substances, with no supervision or collaborative agreement (RCW 18.79; WAC 246-840). (The credential title transitions ARNP → APRN effective June 30, 2027; authority is unchanged.) <b>PAs</b> practice under a <b>collaboration agreement</b> (ESHB 2041, 2024; RCW 18.71A.120), with defined provisions for newer PAs. <b>Physicians (MD/DO)</b> are independent.</p>
+      <h3>7.2 — Consent (statutory non-traditional-treatment protection)</h3>
+      <p><b>RCW 18.130.180(4):</b> "The use of a nontraditional treatment by itself shall not constitute unprofessional conduct, provided that it does not result in injury to a patient or create an unreasonable risk that a patient may be harmed." Informed consent runs on the general framework (RCW 7.70). Document the non-FDA-approved/investigational status, rationale, risks, and alternatives — the consent above does.</p>
+      <h3>7.3 — Sourcing — the Washington gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>Washington restricts office stock.</b> Compounded prescription drugs must be tied to a <b>patient-specific prescription</b>, or supplied to the provider specifically to <b>administer</b> to identified patients — not warehoused as undesignated office stock (WAC 246-945-100, incorporating USP standards). <b>Bulk office stock should come from a 503B outsourcing facility;</b> verify any out-of-state compounder holds a Washington nonresident pharmacy license.</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Permitted under the Uniform Telehealth Act (Ch. 18.134 RCW) — the relationship may be established by telehealth (not by email/text/fax alone) and must meet the same standard of care as in-person, including for prescribing. CS follows Ryan Haight/DEA and the state PMP. <i>Confirm current rules.</i></p>`,
+    sources: `Washington State Board of Nursing (nursing.wa.gov); Washington Medical Commission (wmc.wa.gov); Washington Pharmacy Quality Assurance Commission / DOH (doh.wa.gov); RCW 18.79 & WAC 246-840 (ARNP), RCW 18.71A.120 (PAs), RCW 18.130.180(4) (nontraditional treatment), RCW 7.70 (informed consent), Ch. 18.134 RCW (telehealth), WAC 246-945-100 (compounding); federal 503A vs. 503B compounding framework.`
+  },
+  "Nevada": {
+    consentCompliance: `<div class="statebox"><b>Nevada:</b> This therapy is offered as complementary/alternative care that is experimental or off-label under Nevada law (NRS 630.306). The provider has explained the nature of the treatment, its risks, benefits, and conventional alternatives, and its non-FDA-approved status, obtained the patient's informed consent, and documented the clinical rationale in the record. <i>Verify current requirements with your own Nevada counsel.</i></div>`,
+    section7: `
+      <h3>7.1 — Practice authority (APRN/PA/physician)</h3>
+      <p><b>Nurse practitioners (APRNs):</b> Nevada is a <b>full-practice-authority</b> state — an APRN practices and prescribes independently (NRS 632.237). The one gate is <b>Schedule II</b> controlled substances (requires 2 years / 2,000 hours of APRN practice or a physician-approved protocol) — most peptides are unscheduled, so independent peptide prescribing is unaffected. Requires Board of Pharmacy prescribing license, DEA, and PMP registration. <b>PAs</b> practice under a <b>supervising physician</b> (NRS 630.015/.271) — not independent. <b>Physicians (MD/DO)</b> are independent.</p>
+      <h3>7.2 — Consent (no CAM safe harbor; experimental-therapy consent required)</h3>
+      <p>Nevada has <b>no CAM safe harbor</b> for standard MD/DO/APRN practice (the Board of Homeopathic Medical Examiners is a separate licensure route, not a shield). Prescribing therapy that is experimental by current standards <b>without first obtaining the patient's informed consent</b> is itself grounds for discipline (NRS 630.306(1)(f)) — so written informed consent is mandatory for peptides. The consent above satisfies this.</p>
+      <h3>7.3 — Sourcing — the Nevada gotcha</h3>
+      <div class="statebox" style="border-left:5px solid #B23A2E;background:#FDECEA"><b>Nevada does not allow open office-stock compounding.</b> A pharmacy may compound only for a patient-specific prescription, a chart order for immediate use, or anticipatory compounding for an established patient of that pharmacy (NV Board of Pharmacy compounding standards; NAC 639.661–639.690). <b>For genuine office stock, use a 503B outsourcing facility.</b> (Note: the commonly cited "NRS 639.2583" for office use is a miscitation — rely on the Board's compounding standard and confirm current policy.)</div>
+      <h3>7.4 — Telehealth (if used)</h3>
+      <p>Permitted, including establishing a new patient relationship by telehealth when clinically appropriate (NRS 629.515) — no statutory prior-in-person-visit requirement. Controlled-substance telehealth follows DEA/Ryan Haight and Nevada CS law; peptides are unscheduled. <i>Confirm current rules.</i></p>`,
+    sources: `Nevada State Board of Nursing (nevadanursingboard.org); Nevada State Board of Medical Examiners (medboard.nv.gov); Nevada State Board of Pharmacy (bop.nv.gov); NRS 632.237 (APRN), NRS 630.015/.271/.306 (physicians/PAs/conduct & experimental-therapy consent), NRS 629.515 (telehealth), NAC 639.661–639.690 (compounding); federal 503A vs. 503B compounding framework.`
   }
 };
 
@@ -195,8 +329,9 @@ function render(){
   const lic = v('license');
   const mid = (lic === 'NP' || lic === 'PA');
   const pill = document.getElementById('s7pill');
-  pill.className = 'pill ' + (mid ? 'on' : 'off');
-  pill.textContent = mid ? 'Section 7 on' : 'Section 7 off';
+  const s7on = !!st.section7;
+  pill.className = 'pill ' + (s7on ? 'on' : 'off');
+  pill.textContent = s7on ? 'Section 7 on' : 'Section 7 off';
 
   const clinic = fill(v('clinic'),'Clinic name');
   const prov = fill(v('provider'),'Provider name');
@@ -206,20 +341,19 @@ function render(){
   const fees = fill(v('fees'),'your program fees');
 
   let s7 = '';
-  if (mid){
-    if (st.section7){
-      s7 = `<h2>Section 7 — State Regulatory Overlay (${v('state')})</h2>
-        <div class="disc">Applies to APRNs/PAs. State content researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and believed current. Regulations change — <b>always confirm with your state medical/nursing board and your own medico-legal counsel before use.</b></div>
+  if (st.section7){
+    const physNote = mid ? '' : `<div class="statebox" style="border-left:5px solid #E0A526;background:#FFF8E7"><b>For physicians (${lic}):</b> you have independent practice authority, so the practice-authority items below don't gate you personally. They're included because they govern any NP or PA you supervise or collaborate with — use this as your reference for overseeing them, alongside your own Board of Medicine rules.</div>`;
+    const src = st.sources ? `<p style="font-size:12px;color:#666"><b>Authorities &amp; sources:</b> ${st.sources}</p>` : '';
+    s7 = `<h2>Section 7 — State Regulatory Overlay (${v('state')})</h2>
+        <div class="disc">Applies to APRNs, PAs, and supervising physicians. State content researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and believed current. Regulations change — <b>always confirm with your state medical/nursing board and your own medico-legal counsel before use.</b></div>
+        ${physNote}
         ${st.section7}
         <h3>7.x — National caveat</h3>
-        <p>The FDA/compounding status of specific peptides is federal, changes over time, and applies in every state. Confirm each peptide's current availability before building it into the program.</p>`;
-    } else {
-      s7 = `<h2>Section 7 — State Regulatory Overlay</h2>
-        <div class="statebox"><b>${v('state')} — state specifics not yet built.</b> Your state's practice-authority, consent, sourcing, and telehealth rules should be confirmed with your own counsel. (Practiced.Health is adding states on an ongoing basis.)</div>`;
-    }
+        <p>The FDA/compounding status of specific peptides is federal, changes over time, and applies in every state. Confirm each peptide's current availability before building it into the program.</p>
+        ${src}`;
   } else {
     s7 = `<h2>Section 7 — State Regulatory Overlay</h2>
-      <div class="statebox">Not applicable — this section applies only to APRNs and PAs. As a physician (${lic}), your packet omits it.</div>`;
+      <div class="statebox"><b>${v('state')} — state specifics not yet built.</b> Your state's practice-authority, consent, sourcing, and telehealth rules should be confirmed with your own counsel. (Practiced.Health is adding states on an ongoing basis.)</div>`;
   }
 
   document.getElementById('doc').innerHTML = `
@@ -229,21 +363,44 @@ function render(){
     <div class="disc"><b>Not legal advice.</b> Educational/operational template. Have this reviewed by your own medico-legal counsel before clinical use.</div>
 
     <h2>Section 1 — Provider Program Workflow</h2>
-    <p><b>1. Screen &amp; qualify</b> — patient completes Intake (Sec. 2); review the safety screen first (malignancy hard-stop for angiogenic/GH peptides; pregnancy; reactivity).</p>
-    <p><b>2. Consult &amp; consent</b> — discuss goals/mechanism/evidence tier; patient signs consent (Sec. 3) before the first prescription.</p>
-    <p><b>3. Baseline labs</b> — panel matched to the peptide class (Sec. 5). No angiogenic/GH peptide without malignancy screen addressed.</p>
-    <p><b>4. Prescribe &amp; obtain agent</b> — compounded or other lawful professional-use/investigational source; document agent, source, lot.</p>
-    <p><b>5. Teach administration</b> — reconstitution, technique, storage, fasting rules (GH secretagogues ≥2-hr fast).</p>
-    <p><b>6. Follow up &amp; monitor</b> — per Sec. 5; document every visit (Sec. 6).</p>
-    <p><b>7. Cycle, adjust, or stop</b> — titrate by response, not calendar; hold at lowest effective dose; peptide holidays where indicated.</p>
+    <p>The end-to-end sequence for taking a patient from inquiry to an active, monitored peptide program. Each step maps to a section in this packet.</p>
+    <p><b>1. Screen &amp; qualify.</b> Patient completes the Intake &amp; Safety Screen (Sec. 2). Review the safety screen before anything else — malignancy is a hard stop for angiogenic and growth-hormone-secretagogue peptides until addressed; pregnancy or trying-to-conceive is a hold; note autoimmune status, active infection, and overall reactivity, which drive starting dose.</p>
+    <p><b>2. Consult &amp; consent.</b> Discuss the patient's goals, the mechanism and evidence tier of the proposed peptide(s), realistic expectations, and cost. The patient signs the Informed Consent (Sec. 3) before the first prescription. File the signed consent in the record.</p>
+    <p><b>3. Baseline labs.</b> Order the baseline panel matched to the peptide class (Sec. 5). Do not start an angiogenic or GH peptide until the malignancy screen is addressed and, where indicated, baseline IGF-1 is drawn.</p>
+    <p><b>4. Prescribe &amp; obtain the agent.</b> Prescribe and source the peptide — compounded, or from another lawful professional-use/investigational source. Document the agent, source, and lot in the record for every dispense.</p>
+    <p><b>5. Teach administration.</b> Teach reconstitution, injection technique, storage, and timing. GH secretagogues require a minimum 2-hour fast before injection — fasting matters more than daily frequency. Confirm the patient can demonstrate the technique or has support to do so.</p>
+    <p><b>6. Follow up &amp; monitor.</b> Follow the monitoring schedule in Sec. 5. Reassess response and tolerance, repeat class-specific labs, and document every visit (Sec. 6).</p>
+    <p><b>7. Cycle, adjust, or stop.</b> Titrate by response, not by the calendar. Hold at the lowest effective dose. Use peptide holidays where indicated (e.g., declining VEGF on BPC-157/TB-500). Stop for any safety signal or new contraindication.</p>
 
     <h2>Section 2 — Patient Intake &amp; Safety Screen</h2>
-    <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds}</p>
-    <p><b>Goals:</b> _______  <b>Tried already:</b> _______</p>
-    <p><b>Medical history (check):</b> <span class="ck">☐</span> Cancer/malignancy <b>(safety-critical)</b> · <span class="ck">☐</span> Pregnant/TTC <b>(safety-critical)</b> · <span class="ck">☐</span> Active infection · <span class="ck">☐</span> Autoimmune · <span class="ck">☐</span> CVD · <span class="ck">☐</span> Diabetes/IR · <span class="ck">☐</span> Thyroid · <span class="ck">☐</span> Kidney/liver · <span class="ck">☐</span> Mold/CIRS · <span class="ck">☐</span> Tick-borne · <span class="ck">☐</span> Mental health</p>
-    <p><b>Meds/supplements/prior peptides:</b> _______ &nbsp; <b>Allergies:</b> _______</p>
-    <p><b>Overall reactivity:</b> tolerates most / moderately sensitive / reacts to everything <b>(drives dosing)</b></p>
-    <p><b>Provider safety screen:</b> <span class="ck">☐</span> malignancy addressed before angiogenic/GH peptide · <span class="ck">☐</span> pregnancy confirmed · <span class="ck">☐</span> start-low plan if sensitive · <span class="ck">☐</span> mold/CIRS status noted</p>
+    <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds} &nbsp; <b>Date:</b> _________</p>
+    <p><b>Patient name:</b> ____________________ &nbsp; <b>DOB:</b> _________ &nbsp; <b>Sex:</b> ______ &nbsp; <b>Phone:</b> __________ &nbsp; <b>Email:</b> __________</p>
+    <h3>A. Your goals</h3>
+    <p><b>Primary goal for peptide therapy (in your words):</b> ______________________________________________</p>
+    <p><b>What have you already tried for this, and how did it go?</b> ______________________________________________</p>
+    <p><b>What does success look like for you in 3 months?</b> ______________________________________________</p>
+    <h3>B. Medical history — check all that apply</h3>
+    <p><span class="ck">☐</span> Cancer / malignancy (current or past) <b>— safety-critical</b> · <span class="ck">☐</span> Pregnant, breastfeeding, or trying to conceive <b>— safety-critical</b> · <span class="ck">☐</span> Active or recent infection · <span class="ck">☐</span> Autoimmune condition · <span class="ck">☐</span> Cardiovascular disease · <span class="ck">☐</span> Diabetes / insulin resistance · <span class="ck">☐</span> Thyroid disorder · <span class="ck">☐</span> Kidney or liver disease · <span class="ck">☐</span> Mold / CIRS · <span class="ck">☐</span> Tick-borne illness · <span class="ck">☐</span> Mental health condition · <span class="ck">☐</span> Bleeding or clotting disorder · <span class="ck">☐</span> Prior organ transplant</p>
+    <p><b>If you checked cancer/malignancy — type, date, and current status:</b> ______________________________________________</p>
+    <p><b>Any surgeries or major diagnoses not listed above:</b> ______________________________________________</p>
+    <h3>C. Medications, supplements &amp; allergies</h3>
+    <p><b>Current prescription medications (name &amp; dose):</b> ______________________________________________</p>
+    <p><b>Supplements / OTC / hormones:</b> ______________________________________________</p>
+    <p><b>Prior or current peptide use (which, dose, response, side effects):</b> ______________________________________________</p>
+    <p><b>Allergies / prior reactions to medications or injections:</b> ______________________________________________</p>
+    <h3>D. Reactivity &amp; sensitivity (this drives your starting dose)</h3>
+    <p><b>In general, I:</b> <span class="ck">☐</span> tolerate most medications well · <span class="ck">☐</span> am moderately sensitive · <span class="ck">☐</span> react to almost everything / very sensitive</p>
+    <p><b>History of strong reactions to new supplements, medications, or detox?</b> <span class="ck">☐</span> No · <span class="ck">☐</span> Yes — describe: __________</p>
+    <h3>E. Brief review of systems — check anything current</h3>
+    <p><span class="ck">☐</span> Fatigue · <span class="ck">☐</span> Poor sleep · <span class="ck">☐</span> Brain fog / memory · <span class="ck">☐</span> Mood changes · <span class="ck">☐</span> Joint / muscle pain · <span class="ck">☐</span> Slow recovery / injury · <span class="ck">☐</span> GI symptoms · <span class="ck">☐</span> Weight changes · <span class="ck">☐</span> Low libido / sexual health · <span class="ck">☐</span> Skin / hair changes · <span class="ck">☐</span> Frequent illness / immune</p>
+    <h3>F. Provider safety screen — provider completes &amp; initials</h3>
+    <p>___ Malignancy history reviewed; angiogenic/GH peptides not started until addressed (screen, surveillance, or clearance as indicated).</p>
+    <p>___ Pregnancy / TTC status confirmed; peptides held if pregnant, breastfeeding, or actively trying.</p>
+    <p>___ Drug/supplement interactions reviewed against the proposed peptide(s).</p>
+    <p>___ Reactivity noted; start-low plan documented for sensitive patients.</p>
+    <p>___ Mold/CIRS and tick-borne status noted; gut-barrier/sequencing considerations flagged if relevant.</p>
+    <p>___ Baseline labs ordered appropriate to the peptide class (Sec. 5).</p>
+    <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
 
     <h2>Section 3 — Informed Consent (CAM / Peptide Therapy)</h2>
     <p><b>Practice/Clinic:</b> ${clinic} &nbsp; <b>Treating Provider:</b> ${prov}, ${creds}</p>
@@ -294,16 +451,57 @@ function render(){
     ${st.consentCompliance}
 
     <h2>Section 4 — Patient Conversation Script + FAQ</h2>
-    <p><b>Goals first:</b> "Let's start with what you're hoping to feel or fix — peptides work best aimed at a goal, not as a general tonic."</p>
-    <p><b>What they are · Evidence honesty · Safety · What to expect</b> — <i>(in the app, each line expands to the provider explanation drawn from the Practiced.Health peptide library.)</i></p>
-    <p><b>Cost FAQ answer:</b> ${fees}</p>
+    <p>A guide the provider can follow in the consult, plus ready answers to the questions patients actually ask. Written to be said out loud.</p>
+    <h3>Opening — start with the goal</h3>
+    <p>"Let's start with what you're hoping to feel or fix. Peptides work best when they're aimed at a specific goal — recovery, energy, gut health, sleep — rather than taken as a general tonic. So tell me what's going on and what a good result would look like for you."</p>
+    <h3>What peptides are</h3>
+    <p>"Peptides are short chains of amino acids — the same building blocks your body already uses to signal itself. A peptide therapy is essentially a targeted signal: it tells a specific system to do more of what it's designed to do — repair tissue, calm inflammation, support the gut lining, or nudge your own growth-hormone rhythm. They're not hormones you're replacing wholesale, and they're not stimulants."</p>
+    <h3>Honesty about the evidence</h3>
+    <p>"I want to be straight with you about the science. Some of these have solid human data behind them; others are promising but still early, and a few are used based on strong mechanism and clinical experience rather than large trials. I'll always tell you which tier we're in for what I'm recommending, because you deserve to make an informed choice — not a hyped one."</p>
+    <h3>Safety</h3>
+    <p>"Safety comes first, and that's why the intake matters. A few things are hard stops for certain peptides — an active or recent cancer for the ones that can promote blood-vessel or tissue growth, and pregnancy. We start low, especially if you're someone who reacts to things, and we adjust based on how you respond, not on a fixed schedule."</p>
+    <h3>What to expect</h3>
+    <p>"This isn't usually an overnight switch. Depending on the peptide and the goal, most people notice changes over a few weeks. We'll set a check-in, look at how you're doing and at your labs, and decide together whether to hold, adjust, or move on. If something isn't earning its place, we stop it."</p>
+    <h3>Cost</h3>
+    <p>"Here's what the program runs and what's included: ${fees}. I'd rather you understand exactly what you're paying for than be surprised, so ask me anything about it."</p>
+    <h3>FAQ — ready answers</h3>
+    <p><b>"Are these FDA-approved?"</b> "Some are; many are prescribed as compounded or investigational agents that aren't FDA-approved for this specific use. That's disclosed in your consent, and it's a normal part of this field — but you should know it, and now you do."</p>
+    <p><b>"Are they safe?"</b> "For the right person, screened properly, they have a good safety profile. The risks come from skipping the screen — which is exactly why we don't skip it. I'll tell you the specific risks for what we choose."</p>
+    <p><b>"How long until I feel something?"</b> "Usually a few weeks. Recovery and gut peptides can be faster; growth-hormone-type and longevity peptides are slower and more cumulative."</p>
+    <p><b>"Are there side effects?"</b> "Most are mild — injection-site reactions, temporary water retention, or a flush. I'll go over what's expected versus what should prompt a call."</p>
+    <p><b>"What if it doesn't work?"</b> "Then we don't keep paying for it. We reassess at your check-in and change course. Titrating by response means we're always testing whether it's actually helping you."</p>
+    <p><b>"Do I have to inject myself?"</b> "Most are small subcutaneous injections with a tiny needle, and I'll teach you until you're comfortable. Some options are capsules or nasal — we'll pick what fits you."</p>
 
     <h2>Section 5 — Follow-up &amp; Monitoring</h2>
-    <p><b>Baseline:</b> CBC w/ diff, CMP, HbA1c + fasting insulin, lipids, hs-CRP. Angiogenic/GH → add IGF-1, address malignancy, consider VEGF. Metabolic → fasting insulin/HbA1c. Immune/thymic → markers per case.</p>
-    <p><b>4–6 wk:</b> response/tolerance; class labs; adjust by response. <b>3 mo:</b> reassess vs. goal; VEGF declining on BPC-157/TB-500 → peptide holiday. <b>Ongoing q3–6 mo:</b> periodic labs; reconfirm goals.</p>
+    <p>The labs to draw and the schedule to follow, by peptide class. Dose decisions are driven by the patient's response, not the calendar.</p>
+    <h3>Baseline — before starting (all patients)</h3>
+    <p>CBC with differential, CMP, HbA1c with fasting insulin, fasting lipid panel, hs-CRP. Add class-specific baselines below. Address malignancy screening before any angiogenic/GH peptide.</p>
+    <h3>Class-specific baseline &amp; monitoring</h3>
+    <p><b>Growth-hormone secretagogues</b> (CJC-1295/Ipamorelin, Sermorelin, MK-677-type): baseline and follow-up IGF-1; watch fasting glucose/insulin; enforce the ≥2-hour fast before dosing. Reassess IGF-1 at 6–8 weeks and keep it age-appropriate — not supraphysiologic.</p>
+    <p><b>Angiogenic / tissue-repair</b> (BPC-157, TB-500): malignancy screen addressed before starting; consider baseline and trend VEGF. If VEGF declines on therapy, consider a peptide holiday. Track the injury/recovery target directly.</p>
+    <p><b>Metabolic / weight</b> (tirzepatide, retatrutide, AOD-9604, MOTS-c): fasting insulin, HbA1c, weight, waist; titrate by response to the lowest effective dose — never auto-advance on a label schedule. Monitor GI tolerance. (Semaglutide is excluded from this practice.)</p>
+    <p><b>Immune / thymic</b> (Thymosin Alpha-1, Thymalin): track the immune indication and relevant markers per case; note T-cell polarization if an immune panel is available (TH1 support before Tregs in TH2-dominant/chronic illness).</p>
+    <p><b>Mitochondrial</b> (SS-31/MOTS-c): track energy/functional endpoints; SS-31 works at the cardiolipin level and its ceiling is limited by mitochondrial linoleic-acid availability.</p>
+    <p><b>Gut / barrier</b> (KPV, larazotide, BPC-157): in mold/CIRS, restore the gut barrier first before layering systemic peptides; track GI symptoms and relevant stool markers.</p>
+    <h3>Follow-up schedule</h3>
+    <p><b>4–6 weeks:</b> response and tolerance; repeat class-specific labs; adjust dose by response. <b>3 months:</b> reassess against the original goal; VEGF check on angiogenic peptides; decide hold/adjust/holiday/stop. <b>Ongoing every 3–6 months:</b> periodic labs, reconfirm goals, re-screen safety (especially malignancy surveillance where relevant).</p>
+    <h3>Hold / stop criteria</h3>
+    <p>New malignancy or suspicious finding (angiogenic/GH); pregnancy; supraphysiologic IGF-1; intolerable side effects; no meaningful benefit at an adequate trial; any new contraindication. Document the reason and the plan.</p>
 
     <h2>Section 6 — Per-Visit Documentation (SOAP)</h2>
-    <p><b>S/O/A/P</b> each visit; consent current on file; safety/malignancy reconfirmed if applicable; provider signature + date.</p>
+    <p>A fill-in SOAP note structured for peptide therapy, plus the compliance checklist that should be true at every visit.</p>
+    <p><b>Date:</b> _________ &nbsp; <b>Patient:</b> ____________________ &nbsp; <b>Provider:</b> ____________________ &nbsp; <b>Visit #:</b> ____</p>
+    <h3>S — Subjective</h3>
+    <p>Progress toward stated goal; symptom changes since last visit; tolerance and any side effects; adherence, dose, and injection technique; new symptoms or events. ______________________________________________</p>
+    <h3>O — Objective</h3>
+    <p>Vitals; relevant exam; current labs with dates and comparison to baseline; current peptide(s), dose, agent/source/lot. ______________________________________________</p>
+    <h3>A — Assessment</h3>
+    <p>Response to date (improving / stable / no benefit); tolerance; safety status reconfirmed (malignancy/pregnancy where applicable); risk/benefit still favorable. ______________________________________________</p>
+    <h3>P — Plan</h3>
+    <p>Continue / titrate / hold / holiday / stop — by response, not calendar; dose change and rationale; labs ordered; next follow-up; patient education given. ______________________________________________</p>
+    <h3>Per-visit compliance checklist</h3>
+    <p><span class="ck">☐</span> Signed consent current on file · <span class="ck">☐</span> Safety/malignancy reconfirmed if applicable · <span class="ck">☐</span> Agent, source, and lot documented · <span class="ck">☐</span> Dose changes and rationale recorded · <span class="ck">☐</span> Provider signature + date</p>
+    <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
 
     ${s7}
 
@@ -324,7 +522,7 @@ function setOffer(kind){   // 'addon' (library member) or 'standalone'
 setOffer('standalone');   // default for a new visitor
 async function checkAccess(){
   const q = new URLSearchParams(location.search);
-
+  if (q.get('preview') === 'unlocked'){ unlock(); return; }
   const token = localStorage.getItem('pp_lic_token');
   if (!token){ document.getElementById('lockMsg').textContent = 'New here? Purchase below. Already bought it? Sign in.'; return; }
   try {
@@ -336,13 +534,19 @@ async function checkAccess(){
   } catch(e){ document.getElementById('lockMsg').textContent = 'Could not verify access — please try again.'; }
 }
 
-// Live-update the packet as the user types in any text field (not just dropdowns)
-['clinic','address','phone','email','provider','creds','fees'].forEach(function(id){
+// Manual "Update document" button — deterministic push, with a brief confirmation flash.
+function applyChanges(){
+  render();
+  var b = document.getElementById('applyBtn');
+  if (b){ var t = b.textContent; b.textContent = 'Updated ✓'; b.style.background = '#2D6A2D';
+    setTimeout(function(){ b.textContent = t; b.style.background = '#1F3A5F'; }, 1200); }
+}
+
+// Live-update the packet as the user types in any field (input + change for mobile robustness).
+['clinic','address','phone','email','provider','creds','fees','model','license','state'].forEach(function(id){
   var el = document.getElementById(id);
-  if (el) el.addEventListener('input', render);
+  if (el){ el.addEventListener('input', render); el.addEventListener('change', render); }
 });
-var _mdl = document.getElementById('model');
-if (_mdl) _mdl.addEventListener('change', render);
 
 render();
 checkAccess();
