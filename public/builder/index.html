@@ -85,7 +85,21 @@
     <a class="btn" id="unlockBtn" href="#">Unlock Access →</a>
     <div class="price">One-time · <b id="lockPrice">$797</b></div>
     <div class="msg" id="lockMsg"></div>
-    <div class="signin" style="margin-top:16px;background:rgba(143,227,211,.10);border:1px solid rgba(143,227,211,.30);border-radius:10px;padding:12px 15px;line-height:1.5">✨ Already a <b>Peptides, Practiced.</b> member? <a id="signinLink" style="color:#8fe3d3;font-weight:700;text-decoration:underline;cursor:pointer">Sign in</a> to see your discounted member add-on price.</div>
+    <div class="signin" id="signinBlock" style="margin-top:16px;background:rgba(143,227,211,.10);border:1px solid rgba(143,227,211,.30);border-radius:10px;padding:12px 15px;line-height:1.5">✨ Already a <b>Peptides, Practiced.</b> member? <a id="signinLink" style="color:#8fe3d3;font-weight:700;text-decoration:underline;cursor:pointer">Sign in</a> to see your discounted member add-on price.</div>
+    <div id="siPanel" style="display:none;margin-top:14px;background:rgba(255,255,255,.10);border:1px solid rgba(143,227,211,.30);border-radius:12px;padding:16px 16px 14px;text-align:left">
+      <div style="font-weight:700;color:#fff;font-size:14px;margin-bottom:9px;text-align:center">Member sign-in</div>
+      <div id="siStep1b">
+        <input class="email" id="siEmailB" inputmode="email" placeholder="Email you use for Peptides, Practiced." style="margin-bottom:8px">
+        <a class="btn" id="siSendBtn" href="#" style="display:block;text-align:center">Email me a sign-in code →</a>
+      </div>
+      <div id="siStep2b" style="display:none">
+        <div style="font-size:13px;color:#e7f1f3;margin-bottom:8px">We sent a 6-digit code to <b id="siEmailEchoB"></b>. Enter it below.</div>
+        <input class="email" id="siCodeB" inputmode="numeric" maxlength="6" placeholder="6-digit code" style="margin-bottom:8px;letter-spacing:4px;text-align:center;font-weight:700">
+        <a class="btn" id="siVerifyBtn" href="#" style="display:block;text-align:center">Verify &amp; see my price →</a>
+        <div style="text-align:center;margin-top:9px"><a id="siResetB" style="color:#cfe6e8;font-size:12.5px;text-decoration:underline;cursor:pointer">Use a different email</a></div>
+      </div>
+      <div id="siMsgB" class="msg" style="color:#ffd9d9;text-align:center;min-height:16px"></div>
+    </div>
     <div style="margin-top:16px;font-size:12px;color:#9fbcc4">By purchasing you agree to our <a href="/terms" target="_blank" style="color:#cfe6e8;text-decoration:underline">Terms of Service</a>.</div>
     <div style="margin-top:14px;font-size:12.5px"><a href="/" style="color:#9fbcc4;text-decoration:underline">← Back to the Peptide Library</a></div>
   </div>
@@ -854,7 +868,7 @@ function render(){
     <div class="subtitle">COMPLIANCE-READY PEPTIDE PROGRAM · STATE-SPECIFIC</div>
     <h1>Clinical program tools for ${clinic}</h1>
     <div class="brandline">A Practiced.Health resource for licensed practitioners · Provider: ${prov}, ${creds} · ${addr} · ${phone}</div>
-    <div class="disc"><b>Not legal advice.</b> Educational/operational template. Have this reviewed by your own medico-legal counsel before clinical use.</div>
+    <div class="disc"><b>Researched &amp; current as of ${STATE_RESEARCHED_AS_OF}.</b> The state-specific regulatory and consent content in this program is researched directly from each state's own nursing, medical, and pharmacy boards and statutes. As with any compliance resource, it is advisable to have your own medico-legal counsel review it for your specific practice before clinical use.</div>
 
     <h2>Section 1 — Provider Program Workflow</h2>
     <p>The end-to-end sequence for taking a patient from inquiry to an active, monitored peptide program. Each step maps to a section in this packet.</p>
@@ -1001,13 +1015,68 @@ function render(){
 
     <div class="statebox"><b>Regulatory currency.</b> The state-specific regulatory and consent content in this packet was researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and is believed up to date. Rules change — before using this program, confirm current requirements with your <b>state medical/nursing board</b> and your own <b>medico-legal counsel</b>.</div>
 
-    <h2>Master Disclaimer</h2>
-    <p style="font-size:12px;color:#666"><i>Educational/operational template from Practiced.Health. Not legal advice; establishes no collaborative, supervisory, or employment relationship. The purchasing provider is solely responsible for clinical decisions, prescribing, patient safety, consent, and compliance with all federal and state laws. Have this reviewed by your own medico-legal counsel before clinical use. State content reflects research current as of the delivery date and may change.</i></p>
+    <h2>About this program</h2>
+    <p style="font-size:12px;color:#666"><i>This is a professionally researched, state-specific compliance program from Practiced.Health. Its regulatory and consent content is drawn directly from each state's own medical, nursing, and pharmacy boards and statutes and is current as of the research date shown above. Regulations change over time, so before clinical use, confirm current requirements and have your own medico-legal counsel review the program for your practice. The purchasing provider remains responsible for clinical decisions, prescribing, patient safety, consent, and compliance with all applicable federal and state laws. This program does not create any collaborative, supervisory, or employment relationship.</i></p>
   `;
 }
 
 // ---------- ACCESS GATE ----------
-document.getElementById('signinLink').onclick = () => { try{ localStorage.setItem('pp_after_signin','/builder'); }catch(e){} location.href = '/'; };
+// Stable device id (shared with the library app via the same-origin 'pp_device' key,
+// so the 2-device cap stays consistent across the library and the builder).
+function _dev(){
+  let d=null; try{ d=localStorage.getItem('pp_device'); }catch(e){}
+  if(!d){ try{ d=Array.from(crypto.getRandomValues(new Uint8Array(9))).map(b=>('0'+b.toString(16)).slice(-2)).join(''); localStorage.setItem('pp_device',d); }catch(e){ d='dev'+Math.random().toString(16).slice(2,12); } }
+  return d;
+}
+// Inline member sign-in — no bounce to the library app. The token is saved on this
+// same origin under pp_lic_token, so checkAccess() re-runs and immediately flips the
+// offer to the $397 member add-on price (or unlocks outright if already entitled).
+document.getElementById('signinLink').onclick = () => {
+  const p=document.getElementById('siPanel'); p.style.display='block';
+  const e=document.getElementById('siEmailB');
+  if(e){ try{ e.value=localStorage.getItem('pp_lic_email')||''; }catch(_){ } e.focus(); }
+};
+document.getElementById('siResetB').onclick = () => {
+  document.getElementById('siStep2b').style.display='none';
+  document.getElementById('siStep1b').style.display='block';
+  document.getElementById('siMsgB').textContent='';
+  const el=document.getElementById('siEmailB'); if(el) el.focus();
+};
+document.getElementById('siSendBtn').onclick = (ev) => {
+  ev.preventDefault();
+  const email=(document.getElementById('siEmailB').value||'').trim().toLowerCase();
+  const msg=document.getElementById('siMsgB');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.style.color='#ffd9d9'; msg.textContent='Please enter a valid email.'; return; }
+  msg.style.color='#cfe6e8'; msg.textContent='Sending…';
+  fetch('/api/request-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})})
+    .then(r=>r.json()).then(j=>{
+      window._siEmailB=email;
+      document.getElementById('siEmailEchoB').textContent=email;
+      document.getElementById('siStep1b').style.display='none';
+      document.getElementById('siStep2b').style.display='block';
+      msg.style.color='#cfe6e8'; msg.textContent=j.message||'If that email has an active purchase, we just sent a 6-digit code.';
+      const c=document.getElementById('siCodeB'); if(c) c.focus();
+    }).catch(()=>{ msg.style.color='#ffd9d9'; msg.textContent='Network error — please try again.'; });
+};
+document.getElementById('siVerifyBtn').onclick = (ev) => {
+  ev.preventDefault();
+  const email=window._siEmailB, code=(document.getElementById('siCodeB').value||'').trim();
+  const msg=document.getElementById('siMsgB');
+  if(!/^\d{6}$/.test(code)){ msg.style.color='#ffd9d9'; msg.textContent='Enter the 6-digit code.'; return; }
+  msg.style.color='#cfe6e8'; msg.textContent='Checking…';
+  fetch('/api/verify-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,code,device:_dev()})})
+    .then(r=>r.json().then(j=>({ok:r.ok,j})))
+    .then(res=>{
+      if(res.ok && res.j.token){
+        try{ localStorage.setItem('pp_lic_token',res.j.token); localStorage.setItem('pp_lic_email',res.j.email||email); }catch(e){}
+        msg.style.color='#8fe3d3'; msg.textContent='Signed in ✓';
+        checkAccess();
+        setTimeout(()=>{ const p=document.getElementById('siPanel'); if(p) p.style.display='none'; }, 1000);
+      } else {
+        msg.style.color='#ffd9d9'; msg.textContent=(res.j&&res.j.message)||'That code did not match. Request a new one.';
+      }
+    }).catch(()=>{ msg.style.color='#ffd9d9'; msg.textContent='Network error — please try again.'; });
+};
 function unlock(){ document.getElementById('lock').style.display = 'none'; }
 function setOffer(kind){   // 'addon' (library member) or 'standalone'
   document.getElementById('lockPrice').textContent = (kind === 'addon') ? PRICE_ADDON : PRICE_STANDALONE;
@@ -1023,8 +1092,16 @@ async function checkAccess(){
     const r = await fetch('/api/builder-access', { headers: { Authorization: 'Bearer ' + token } });
     const d = await r.json().catch(()=>({}));
     if (r.ok && d.entitled){ unlock(); return; }
-    if (d.member){ setOffer('addon'); document.getElementById('lockMsg').textContent = 'Add it to your membership below.'; }
-    else { setOffer('standalone'); }
+    const sb = document.getElementById('signinBlock'), sp = document.getElementById('siPanel');
+    if (d.member){
+      setOffer('addon');
+      if (sb) sb.style.display = 'none';
+      if (sp) sp.style.display = 'none';
+      document.getElementById('lockMsg').style.color = '#8fe3d3';
+      document.getElementById('lockMsg').textContent = 'Signed in as a member — your ' + PRICE_ADDON + ' add-on price is applied below.';
+    } else {
+      setOffer('standalone');
+    }
   } catch(e){ document.getElementById('lockMsg').textContent = 'Could not verify access — please try again.'; }
 }
 
