@@ -59,6 +59,12 @@
     .wrap{display:block;height:auto}.preview{overflow:visible;padding:0;background:#fff}
     .doc{box-shadow:none;max-width:none;padding:0;border-radius:0}
     .doc h2{page-break-after:avoid}
+    .doc h3{page-break-after:avoid}
+    /* each numbered section starts its own page, so the packet prints/saves as
+       separable individual documents (intake, consent, script, monitoring, SOAP, overlay). */
+    .doc h2.secstart{page-break-before:always}
+    /* keep signature lines, callout boxes, tables, and list items from splitting across pages */
+    .doc .statebox,.doc .disc,.doc table,.doc tr,.doc li,.doc .sig,.doc .siglines{page-break-inside:avoid}
   }
 </style></head>
 <body>
@@ -81,7 +87,7 @@
       <li>NP/PA vs. physician logic handled automatically</li>
       <li>Print or save each form as a fillable PDF</li>
     </ul>
-    <input class="email" id="lockEmail" placeholder="Email you purchased with">
+    <input class="email" id="lockEmail" placeholder="Email you bought the program with">
     <a class="btn" id="unlockBtn" href="#">Unlock Access →</a>
     <div class="price">One-time · <b id="lockPrice">$797</b></div>
     <div class="msg" id="lockMsg"></div>
@@ -89,7 +95,7 @@
     <div id="siPanel" style="display:none;margin-top:14px;background:rgba(255,255,255,.10);border:1px solid rgba(143,227,211,.30);border-radius:12px;padding:16px 16px 14px;text-align:left">
       <div style="font-weight:700;color:#fff;font-size:14px;margin-bottom:9px;text-align:center">Member sign-in</div>
       <div id="siStep1b">
-        <input class="email" id="siEmailB" inputmode="email" placeholder="Email you use for Peptides, Practiced." style="margin-bottom:8px">
+        <input class="email" id="siEmailB" inputmode="email" placeholder="Email you bought the Peptides, Practiced. library with" style="margin-bottom:8px">
         <a class="btn" id="siSendBtn" href="#" style="display:block;text-align:center">Email me a sign-in code →</a>
       </div>
       <div id="siStep2b" style="display:none">
@@ -852,7 +858,7 @@ function render(){
   if (st.section7){
     const physNote = mid ? '' : `<div class="statebox" style="border-left:5px solid #E0A526;background:#FFF8E7"><b>For physicians (${lic}):</b> you have independent practice authority, so the practice-authority items below don't gate you personally. They're included because they govern any NP or PA you supervise or collaborate with — use this as your reference for overseeing them, alongside your own Board of Medicine rules.</div>`;
     const src = st.sources ? `<p style="font-size:12px;color:#666"><b>Authorities &amp; sources:</b> ${st.sources}</p>` : '';
-    s7 = `<h2>Section 7 — State Regulatory Overlay (${v('state')})</h2>
+    s7 = `<h2 class="secstart">Section 7 — State Regulatory Overlay (${v('state')})</h2>
         <div class="disc">Applies to APRNs, PAs, and supervising physicians. State content researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and believed current. Regulations change — <b>always confirm with your state medical/nursing board and your own medico-legal counsel before use.</b></div>
         ${physNote}
         ${st.section7}
@@ -860,7 +866,7 @@ function render(){
         <p>The FDA/compounding status of specific peptides is federal, changes over time, and applies in every state. Confirm each peptide's current availability before building it into the program.</p>
         ${src}`;
   } else {
-    s7 = `<h2>Section 7 — State Regulatory Overlay</h2>
+    s7 = `<h2 class="secstart">Section 7 — State Regulatory Overlay</h2>
       <div class="statebox"><b>${v('state')} — state specifics not yet built.</b> Your state's practice-authority, consent, sourcing, and telehealth rules should be confirmed with your own counsel. (Practiced.Health is adding states on an ongoing basis.)</div>`;
   }
 
@@ -870,7 +876,7 @@ function render(){
     <div class="brandline">A Practiced.Health resource for licensed practitioners · Provider: ${prov}, ${creds} · ${addr} · ${phone}</div>
     <div class="disc"><b>Researched &amp; current as of ${STATE_RESEARCHED_AS_OF}.</b> The state-specific regulatory and consent content in this program is researched directly from each state's own nursing, medical, and pharmacy boards and statutes. As with any compliance resource, it is advisable to have your own medico-legal counsel review it for your specific practice before clinical use.</div>
 
-    <h2>Section 1 — Provider Program Workflow</h2>
+    <h2 class="secstart">Section 1 — Provider Program Workflow</h2>
     <p>The end-to-end sequence for taking a patient from inquiry to an active, monitored peptide program. Each step maps to a section in this packet.</p>
     <p><b>1. Screen &amp; qualify.</b> Patient completes the Intake &amp; Safety Screen (Sec. 2). Review the safety screen before anything else — malignancy is a hard stop for angiogenic and growth-hormone-secretagogue peptides until addressed; pregnancy or trying-to-conceive is a hold; note autoimmune status, active infection, and overall reactivity, which drive starting dose.</p>
     <p><b>2. Consult &amp; consent.</b> Discuss the patient's goals, the mechanism and evidence tier of the proposed peptide(s), realistic expectations, and cost. The patient signs the Informed Consent (Sec. 3) before the first prescription. File the signed consent in the record.</p>
@@ -880,7 +886,7 @@ function render(){
     <p><b>6. Follow up &amp; monitor.</b> Follow the monitoring schedule in Sec. 5. Reassess response and tolerance, repeat class-specific labs, and document every visit (Sec. 6).</p>
     <p><b>7. Cycle, adjust, or stop.</b> Titrate by response, not by the calendar. Hold at the lowest effective dose. Use peptide holidays where indicated (e.g., declining VEGF on BPC-157/TB-500). Stop for any safety signal or new contraindication.</p>
 
-    <h2>Section 2 — Patient Intake &amp; Safety Screen</h2>
+    <h2 class="secstart">Section 2 — Patient Intake &amp; Safety Screen</h2>
     <p><b>Clinic:</b> ${clinic} &nbsp; <b>Provider:</b> ${prov}, ${creds} &nbsp; <b>Date:</b> _________</p>
     <p><b>Patient name:</b> ____________________ &nbsp; <b>DOB:</b> _________ &nbsp; <b>Sex:</b> ______ &nbsp; <b>Phone:</b> __________ &nbsp; <b>Email:</b> __________</p>
     <h3>A. Your goals</h3>
@@ -910,7 +916,7 @@ function render(){
     <p>___ Baseline labs ordered appropriate to the peptide class (Sec. 5).</p>
     <p><b>Provider signature:</b> ____________________ &nbsp; <b>Date:</b> _________</p>
 
-    <h2>Section 3 — Informed Consent (CAM / Peptide Therapy)</h2>
+    <h2 class="secstart">Section 3 — Informed Consent (CAM / Peptide Therapy)</h2>
     <p><b>Practice/Clinic:</b> ${clinic} &nbsp; <b>Treating Provider:</b> ${prov}, ${creds}</p>
     <p><b>Patient Name:</b> ____________________ &nbsp; <b>DOB:</b> _________ &nbsp; <b>Date:</b> _________</p>
     <p>This Consent describes the treatment plan, anticipated laboratory/diagnostic testing, potential benefits, and possible risks of the peptide/CAM treatment being offered. Take your time, read it carefully, and ask any questions. When your questions are answered to your satisfaction, you will be asked to sign. Do not allow yourself to be pressured. You may withdraw your consent at any time.</p>
@@ -958,7 +964,7 @@ function render(){
     <p><b>Witness (if used):</b> ____________________ &nbsp; <b>Date:</b> _________</p>
     ${st.consentCompliance}
 
-    <h2>Section 4 — Patient Conversation Script + FAQ</h2>
+    <h2 class="secstart">Section 4 — Patient Conversation Script + FAQ</h2>
     <p>A guide the provider can follow in the consult, plus ready answers to the questions patients actually ask. Written to be said out loud.</p>
     <h3>Opening — start with the goal</h3>
     <p>"Let's start with what you're hoping to feel or fix. Peptides work best when they're aimed at a specific goal — recovery, energy, gut health, sleep — rather than taken as a general tonic. So tell me what's going on and what a good result would look like for you."</p>
@@ -980,15 +986,15 @@ function render(){
     <p><b>"What if it doesn't work?"</b> "Then we don't keep paying for it. We reassess at your check-in and change course. Titrating by response means we're always testing whether it's actually helping you."</p>
     <p><b>"Do I have to inject myself?"</b> "Most are small subcutaneous injections with a tiny needle, and I'll teach you until you're comfortable. Some options are capsules or nasal — we'll pick what fits you."</p>
 
-    <h2>Section 5 — Follow-up &amp; Monitoring</h2>
+    <h2 class="secstart">Section 5 — Follow-up &amp; Monitoring</h2>
     <p>The labs to draw and the schedule to follow, by peptide class. Dose decisions are driven by the patient's response, not the calendar.</p>
-    <h3>Baseline — before starting (all patients)</h3>
-    <p>CBC with differential, CMP, HbA1c with fasting insulin, fasting lipid panel, hs-CRP. Add class-specific baselines below. Address malignancy screening before any angiogenic/GH peptide.</p>
+    <h3>Baseline — before starting</h3>
+    <p><b>Baseline labs are risk-tiered, not one-size-fits-all.</b> For the low-risk immune and repair peptides (Thymosin Alpha-1, Thymalin, BPC-157, TB-500, KPV, Selank, Semax), clearance is <b>history-based</b> — screen for active autoimmune flare, solid-organ transplant, and active malignancy — with labs left to <b>provider discretion</b>. A general panel (CBC with differential, CMP, HbA1c with fasting insulin, fasting lipid panel, hs-CRP) is recommended best practice and gives you a before-and-after, but is not mandatory for these agents. <b>Required</b> class-specific baselines apply to the growth-hormone, incretin/metabolic, and hormonal agents below. Address malignancy screening before any angiogenic or GH peptide.</p>
     <h3>Class-specific baseline &amp; monitoring</h3>
     <p><b>Growth-hormone secretagogues</b> (CJC-1295/Ipamorelin, Sermorelin, MK-677-type): baseline and follow-up IGF-1; watch fasting glucose/insulin; enforce the ≥2-hour fast before dosing. Reassess IGF-1 at 6–8 weeks and keep it age-appropriate — not supraphysiologic.</p>
     <p><b>Angiogenic / tissue-repair</b> (BPC-157, TB-500): malignancy screen addressed before starting; consider baseline and trend VEGF. If VEGF declines on therapy, consider a peptide holiday. Track the injury/recovery target directly.</p>
     <p><b>Metabolic / weight</b> (tirzepatide, retatrutide, AOD-9604, MOTS-c): fasting insulin, HbA1c, weight, waist; titrate by response to the lowest effective dose — never auto-advance on a label schedule. Monitor GI tolerance. (Semaglutide is excluded from this practice.)</p>
-    <p><b>Immune / thymic</b> (Thymosin Alpha-1, Thymalin): track the immune indication and relevant markers per case; note T-cell polarization if an immune panel is available (TH1 support before Tregs in TH2-dominant/chronic illness).</p>
+    <p><b>Immune / thymic</b> (Thymosin Alpha-1, Thymalin): history-based clearance — screen for active autoimmune flare, transplant, and active malignancy before starting. Recommended immune panel: <b>CBC with differential</b> and <b>quantitative immunoglobulins (IgG, IgA, IgM)</b> to characterize the immune picture and rule out an underlying immunodeficiency before attributing recurrent infection to a "tired" immune system. Track the immune indication and relevant markers per case; note T-cell polarization if an immune panel is available (TH1 support before Tregs in TH2-dominant/chronic illness).</p>
     <p><b>Mitochondrial</b> (SS-31/MOTS-c): track energy/functional endpoints; SS-31 works at the cardiolipin level and its ceiling is limited by mitochondrial linoleic-acid availability.</p>
     <p><b>Gut / barrier</b> (KPV, larazotide, BPC-157): in mold/CIRS, restore the gut barrier first before layering systemic peptides; track GI symptoms and relevant stool markers.</p>
     <h3>Follow-up schedule</h3>
@@ -996,7 +1002,7 @@ function render(){
     <h3>Hold / stop criteria</h3>
     <p>New malignancy or suspicious finding (angiogenic/GH); pregnancy; supraphysiologic IGF-1; intolerable side effects; no meaningful benefit at an adequate trial; any new contraindication. Document the reason and the plan.</p>
 
-    <h2>Section 6 — Per-Visit Documentation (SOAP)</h2>
+    <h2 class="secstart">Section 6 — Per-Visit Documentation (SOAP)</h2>
     <p>A fill-in SOAP note structured for peptide therapy, plus the compliance checklist that should be true at every visit.</p>
     <p><b>Date:</b> _________ &nbsp; <b>Patient:</b> ____________________ &nbsp; <b>Provider:</b> ____________________ &nbsp; <b>Visit #:</b> ____</p>
     <h3>S — Subjective</h3>
@@ -1015,7 +1021,7 @@ function render(){
 
     <div class="statebox"><b>Regulatory currency.</b> The state-specific regulatory and consent content in this packet was researched as of <b>${STATE_RESEARCHED_AS_OF}</b> and is believed up to date. Rules change — before using this program, confirm current requirements with your <b>state medical/nursing board</b> and your own <b>medico-legal counsel</b>.</div>
 
-    <h2>About this program</h2>
+    <h2 class="secstart">About this program</h2>
     <p style="font-size:12px;color:#666"><i>This is a professionally researched, state-specific compliance program from Practiced.Health. Its regulatory and consent content is drawn directly from each state's own medical, nursing, and pharmacy boards and statutes and is current as of the research date shown above. Regulations change over time, so before clinical use, confirm current requirements and have your own medico-legal counsel review the program for your practice. The purchasing provider remains responsible for clinical decisions, prescribing, patient safety, consent, and compliance with all applicable federal and state laws. This program does not create any collaborative, supervisory, or employment relationship.</i></p>
   `;
 }
