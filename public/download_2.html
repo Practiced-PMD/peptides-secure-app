@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download your library — Peptides, Practiced.</title>
+<style>
+ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F7F5F1;color:#232a31;margin:0;padding:40px 20px;text-align:center}
+ .card{max-width:540px;margin:36px auto;background:#fff;border:1px solid #e4e0d8;border-radius:16px;padding:38px 34px;box-shadow:0 8px 30px rgba(31,58,95,.06)}
+ h1{color:#1F3A5F;font-size:25px;margin:0 0 8px}
+ .kicker{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#2E7D8A;font-weight:700;margin-bottom:10px}
+ p{color:#6b7783;font-size:15px;line-height:1.65}
+ .btn{display:inline-block;background:#1F3A5F;color:#fff;border:none;border-radius:11px;padding:15px 30px;font-size:17px;font-weight:600;cursor:pointer;margin-top:16px;text-decoration:none}
+ .btn:hover{background:#16293f}
+ .btn:disabled{opacity:.5;cursor:default}
+ .btn.teal{background:#2E7D8A}.btn.teal:hover{background:#25646f}
+ .muted{font-size:13px;color:#8a94a0;margin-top:20px}
+ .err{color:#c0392b;font-weight:600;min-height:20px;margin-top:14px;font-size:14px}
+ a.link{color:#2E7D8A;text-decoration:none;cursor:pointer}
+ .signin{margin-top:22px;background:#F4F8FB;border:1px solid #dbe8f2;border-radius:13px;padding:20px 20px 18px;text-align:left}
+ .signin h2{color:#1F3A5F;font-size:16px;margin:0 0 4px;text-align:center}
+ .signin .sub{font-size:13px;color:#6b7783;text-align:center;margin:0 0 14px}
+ .inp{width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #cdddf0;border-radius:10px;font-size:15px;margin-bottom:10px}
+ #siCode{letter-spacing:4px;text-align:center;font-weight:700}
+ .simsg{font-size:13px;min-height:18px;text-align:center;margin-top:8px;color:#6b7783}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="kicker">Peptides, Practiced. — Beyond the Course</div>
+  <h1>Your PDF Library</h1>
+  <p>The complete library — every teaching volume, protocol, reference, and consent template — as a downloadable PDF pack. This download is for signed-in members only.</p>
+
+  <!-- Download (shown once signed in) -->
+  <div id="dlArea" style="display:none">
+    <button class="btn" id="dl">⬇ Download the library</button>
+    <div class="err" id="err"></div>
+    <p class="muted">Signed in as <b id="who">—</b>. <a class="link" id="switchLink">Not you? Sign in with a different email</a>.</p>
+  </div>
+
+  <!-- Inline sign-in (shown when not signed in on this device) -->
+  <div class="signin" id="siPanel" style="display:none">
+    <h2>Verify you're a member</h2>
+    <p class="sub">Enter the email you bought the Peptides, Practiced. library with. We'll send a 6-digit code — no password needed.</p>
+    <div id="siStep1">
+      <input class="inp" id="siEmail" inputmode="email" placeholder="Email you bought the library with">
+      <button class="btn teal" id="siSend" style="width:100%;margin-top:2px">Email me a sign-in code →</button>
+    </div>
+    <div id="siStep2" style="display:none">
+      <p class="sub">We sent a 6-digit code to <b id="siEcho"></b>. Enter it below.</p>
+      <input class="inp" id="siCode" inputmode="numeric" maxlength="6" placeholder="6-digit code">
+      <button class="btn teal" id="siVerify" style="width:100%;margin-top:2px">Verify &amp; unlock download →</button>
+      <p style="text-align:center;margin:10px 0 0"><a class="link" id="siReset" style="font-size:13px">Use a different email</a></p>
+    </div>
+    <div class="simsg" id="siMsg"></div>
+  </div>
+</div>
+<script>
+function tok(){ try{ return localStorage.getItem('pp_lic_token')||''; }catch(e){ return ''; } }
+function whoEmail(){ try{ return localStorage.getItem('pp_lic_email')||''; }catch(e){ return ''; } }
+function tokenValid(){
+  var t = tok();
+  if(!t || t.indexOf('.')<0) return false;
+  try{
+    var p = JSON.parse(atob(t.split('.')[0].replace(/-/g,'+').replace(/_/g,'/')));
+    return p && p.exp && (Date.now()/1000) < p.exp;
+  }catch(e){ return false; }
+}
+// Stable device id shared with the app (same-origin 'pp_device' key), so the
+// 2-device cap stays consistent across the app and this download page.
+function dev(){
+  var d=null; try{ d=localStorage.getItem('pp_device'); }catch(e){}
+  if(!d){ try{ d=Array.from(crypto.getRandomValues(new Uint8Array(9))).map(function(b){return ('0'+b.toString(16)).slice(-2);}).join(''); localStorage.setItem('pp_device',d); }catch(e){ d='dev'+Math.random().toString(16).slice(2,12); } }
+  return d;
+}
+var $ = function(id){ return document.getElementById(id); };
+
+function showSignedIn(){
+  $('who').textContent = whoEmail() || 'member';
+  $('dlArea').style.display = 'block';
+  $('siPanel').style.display = 'none';
+}
+function showSignIn(prefill){
+  $('dlArea').style.display = 'none';
+  $('siPanel').style.display = 'block';
+  $('siStep2').style.display = 'none';
+  $('siStep1').style.display = 'block';
+  var e = $('siEmail'); if(e){ e.value = prefill || whoEmail() || ''; e.focus(); }
+}
+
+// Decide initial view.
+if(tokenValid()){ showSignedIn(); } else { showSignIn(); }
+
+// "Not you?" — let a signed-in user switch accounts.
+$('switchLink').addEventListener('click', function(){ showSignIn(''); });
+
+// Request a code.
+$('siSend').addEventListener('click', function(){
+  var email = ($('siEmail').value||'').trim().toLowerCase(), msg = $('siMsg');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ msg.style.color='#c0392b'; msg.textContent='Please enter a valid email.'; return; }
+  msg.style.color='#6b7783'; msg.textContent='Sending…';
+  fetch('/api/request-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email})})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      window._siEmail = email;
+      $('siEcho').textContent = email;
+      $('siStep1').style.display='none';
+      $('siStep2').style.display='block';
+      msg.style.color='#2E7D8A'; msg.textContent = j.message || 'If that email has an active purchase, we just sent a 6-digit code.';
+      var c=$('siCode'); if(c) c.focus();
+    })
+    .catch(function(){ msg.style.color='#c0392b'; msg.textContent='Network error — please try again.'; });
+});
+$('siReset').addEventListener('click', function(){
+  $('siStep2').style.display='none'; $('siStep1').style.display='block'; $('siMsg').textContent='';
+  var e=$('siEmail'); if(e) e.focus();
+});
+
+// Verify the code -> save token -> unlock download.
+$('siVerify').addEventListener('click', function(){
+  var email = window._siEmail, code = ($('siCode').value||'').trim(), msg = $('siMsg');
+  if(!/^\d{6}$/.test(code)){ msg.style.color='#c0392b'; msg.textContent='Enter the 6-digit code.'; return; }
+  msg.style.color='#6b7783'; msg.textContent='Checking…';
+  fetch('/api/verify-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email,code:code,device:dev()})})
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+    .then(function(res){
+      if(res.ok && res.j.token){
+        try{ localStorage.setItem('pp_lic_token', res.j.token); localStorage.setItem('pp_lic_email', res.j.email||email); }catch(e){}
+        msg.style.color='#2E7D8A'; msg.textContent='Signed in ✓';
+        showSignedIn();
+      } else {
+        msg.style.color='#c0392b'; msg.textContent = (res.j&&res.j.message) || 'That code did not match. Request a new one.';
+      }
+    })
+    .catch(function(){ msg.style.color='#c0392b'; msg.textContent='Network error — please try again.'; });
+});
+
+// Download the protected pack.
+$('dl').addEventListener('click', function(){
+  var t = tok(), err = $('err'), btn = $('dl');
+  if(!tokenValid()){ showSignIn(whoEmail()); return; }
+  err.textContent=''; btn.disabled=true; btn.textContent='Preparing your download…';
+  fetch('/api/get-doc?id=library', { headers: { Authorization: 'Bearer ' + t } })
+    .then(function(r){
+      if(!r.ok){
+        if(r.status===401){ btn.disabled=false; btn.textContent='⬇ Download the library'; showSignIn(whoEmail()); throw new Error('Please verify your email below to unlock the download.'); }
+        if(r.status===403){ btn.disabled=false; btn.textContent='⬇ Download the library'; showSignIn(whoEmail()); throw new Error('This device needs to be re-activated (you may be signed in on 2 other devices). Verify below to activate this one.'); }
+        throw new Error('The download is unavailable right now (error ' + r.status + '). Please try again shortly.');
+      }
+      return r.blob();
+    })
+    .then(function(blob){
+      var url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'Peptides-Practiced-Library.zip';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 6000);
+      btn.disabled=false; btn.textContent='✓ Downloaded — download again';
+    })
+    .catch(function(e){
+      err.textContent = e.message || 'Download failed. Please try again.';
+      btn.disabled=false; if(btn.textContent==='Preparing your download…') btn.textContent='⬇ Download the library';
+    });
+});
+</script>
+</body>
+</html>
