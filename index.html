@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Peptide Decision Support — Practiced.</title>
+<style>
+  :root{
+    --navy:#1F3A5F;--navy2:#16293f;--teal:#2E7D8A;--mint:#8fe3d3;--amber:#BF8F00;
+    --bg:#EEF2F2;--card:#fff;--ink:#232a31;--muted:#6b7783;--line:#e2e6e6;
+    --green:#2E6B3E;--green-bg:#EAF6EE;--red:#9C2A2A;--red-bg:#FBEDEC;--cau:#8a5a12;--cau-bg:#FBF3E0;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --serif:'Fraunces',Georgia,serif;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.5;
+    padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  header{background:linear-gradient(135deg,var(--navy2),var(--teal));color:#fff;padding:18px 22px 14px}
+  header .kick{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--mint);text-transform:uppercase}
+  header h1{font-family:var(--serif);font-size:22px;font-weight:600;margin:2px 0 4px}
+  header p{font-size:12.5px;color:#dbeef0;max-width:760px}
+  header .gloss{margin-top:9px;background:rgba(255,255,255,.14);border:none;color:#fff;font-weight:700;font-size:12px;padding:6px 13px;border-radius:8px;cursor:pointer}
+  .disc{background:var(--red-bg);border-left:4px solid var(--red);color:#7a2020;font-size:12px;padding:9px 22px;font-weight:600}
+  .adminnote{background:#e9f3f4;border-left:4px solid var(--teal);color:#245b63;font-size:12px;padding:8px 22px}
+  .layout{display:grid;grid-template-columns:330px 1fr}
+  @media(max-width:800px){.layout{grid-template-columns:1fr}}
+  .panel{background:#f7f9f9;border-right:1px solid var(--line);padding:18px 20px 40px}
+  .panel h2{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--teal);font-weight:800;margin:16px 0 7px}
+  .panel h2:first-child{margin-top:0}
+  select{width:100%;padding:9px 11px;border:1px solid #cfd8d8;border-radius:9px;font-size:14px;font-family:var(--sans);background:#fff}
+  .flag{display:flex;align-items:center;gap:9px;padding:7px 9px;border:1px solid #e0e6e6;border-radius:9px;margin-bottom:6px;cursor:pointer;background:#fff;font-size:13px}
+  .flag input{width:16px;height:16px;accent-color:var(--navy)}
+  .flag.on{border-color:var(--navy);background:#eef2f7}
+  .flag .ab{border-bottom:1px dotted var(--muted);cursor:help}
+  .out{padding:18px 22px 70px;max-width:800px}
+  .goalhdr{font-family:var(--serif);font-size:18px;color:var(--navy);font-weight:600;margin-bottom:3px}
+  .goalsub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .grp{margin-bottom:16px}
+  .grptitle{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .grptitle .dot{width:11px;height:11px;border-radius:50%}
+  .g-avoid .dot{background:var(--red)} .g-avoid{color:var(--red)}
+  .g-caution .dot{background:var(--amber)} .g-caution{color:var(--cau)}
+  .g-consider .dot{background:var(--green)} .g-consider{color:var(--green)}
+  .item{border:1px solid var(--line);border-left-width:4px;border-radius:10px;margin-bottom:9px;background:#fff;overflow:hidden}
+  .item.avoid{border-left-color:var(--red)} .item.caution{border-left-color:var(--amber)} .item.consider{border-left-color:var(--green)}
+  .ihead{padding:11px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .ihead:hover{background:#fafcfc}
+  .iname{font-weight:800;color:var(--ink);font-size:14.5px}
+  .ivol{font-size:10px;font-weight:800;color:var(--teal);background:#e4f4f5;padding:1px 7px;border-radius:11px;margin-left:7px;vertical-align:1px}
+  .iclass{font-size:11px;color:var(--muted);margin-left:6px}
+  .ireason{font-size:12.5px;color:#333;margin-top:5px}
+  .ialt{font-size:12px;margin-top:6px;padding:6px 9px;border-radius:7px;background:#eef2f7;color:var(--navy)}
+  .ialt b{color:var(--teal)}
+  .chev{color:var(--muted);font-size:12px;font-weight:700;white-space:nowrap;margin-top:2px}
+  .detail{display:none;padding:0 13px 13px;border-top:1px dashed #e2e6e6}
+  .item.open .detail{display:block}
+  .drow{margin-top:10px}
+  .dlab{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--teal);display:block;margin-bottom:2px}
+  .dval{font-size:12.5px;color:#333}
+  .dval.dose{background:#f7f9f9;border:1px solid #e7ecec;border-radius:7px;padding:7px 9px;font-weight:600}
+  .tier{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:11px}
+  .t-est{background:#e7f6ef;color:#1f6b52}.t-emg{background:#e4f4f5;color:#1c6b74}.t-pre{background:#FBF3E0;color:#7a5a00}.t-mech{background:#eef1f5;color:#41546e}
+  .empty{color:var(--muted);font-size:13px;padding:10px 0}
+  .foot{padding:14px 22px 44px;color:var(--muted);font-size:11px;max-width:900px;border-top:1px solid var(--line)}
+  /* glossary modal */
+  .modal{display:none;position:fixed;inset:0;background:rgba(20,30,45,.55);z-index:100;align-items:center;justify-content:center;padding:20px}
+  .modal.show{display:flex}
+  .mbox{background:#fff;border-radius:14px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto;padding:22px 24px}
+  .mbox h3{font-family:var(--serif);color:var(--navy);font-size:19px;margin-bottom:4px}
+  .mbox .close{float:right;cursor:pointer;color:var(--muted);font-weight:800;font-size:18px}
+  .grow{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #eef1f1;font-size:13px}
+  .grow b{color:var(--navy);min-width:78px}
+  .refnum{display:inline-block;background:#e4f4f5;color:var(--teal);font-weight:800;font-size:11px;min-width:18px;text-align:center;padding:1px 6px;border-radius:10px;margin-right:4px;cursor:pointer}
+  .refnum:hover{background:var(--teal);color:#fff}
+</style>
+</head>
+<body>
+<div style="background:#16293f;display:flex;justify-content:center;gap:8px;padding:7px 10px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;position:relative;z-index:61">
+  <a href="/" style="background:rgba(255,255,255,.10);color:#cfe6e8;font-weight:700;font-size:13px;padding:7px 15px;border-radius:8px;text-decoration:none">📚 Peptide Library</a>
+  <a href="/builder" style="background:rgba(255,255,255,.10);color:#cfe6e8;font-weight:700;font-size:13px;padding:7px 15px;border-radius:8px;text-decoration:none">🔒 Compliance-Ready Program</a>
+  <span style="background:#2E7D8A;color:#fff;font-weight:700;font-size:13px;padding:7px 15px;border-radius:8px">🧬 Decision Tool</span>
+</div>
+<script>window.__ppSignedIn=(function(){try{var t=localStorage.getItem("pp_lic_token")||"";if(!t||t.indexOf(".")<0)return false;var p=JSON.parse(atob(t.split(".")[0].replace(/-/g,"+").replace(/_/g,"/")));return !!(p&&p.exp&&(Date.now()/1000)<p.exp);}catch(e){return false;}})();</script>
+
+<header>
+  <div class="kick">Peptides, Practiced. · Decision Support</div>
+  <h1>Peptide Decision-Support Tool</h1>
+  <p>Set the goal, describe the patient, and the tool steers toward, cautions, or flags peptides to avoid — with dosing, mechanism, monitoring, and a suggested alternative when something isn't the right fit. Tap any peptide to expand the full detail.</p>
+  <button class="gloss" onclick="document.getElementById('gloss').classList.add('show')">Abbreviations &amp; glossary</button> <button class="gloss" onclick="openRefs()" style="margin-left:6px">References</button> <button class="gloss" onclick="document.getElementById('screen').classList.add('show')" style="margin-left:6px">Screening &amp; labs</button>
+</header>
+<div class="disc">Clinical decision support for licensed clinicians — not a protocol, not a directive. Dosing is reference from the library; verify, individualize, and confirm current sourcing &amp; regulatory status before prescribing. Your clinical judgment governs.</div>
+<div class="adminnote"><b>Administration:</b> most peptides here are given <b>subcutaneously (SC) or intramuscularly (IM)</b> — SC is the most common route; the route shown per peptide is the typical reference and SC/IM applies broadly. Current U.S. compounding limits affect <i>sourcing</i>, not the route of administration.</div>
+
+<div class="layout">
+  <div class="panel">
+    <h2>Primary goal</h2>
+    <select id="goal" onchange="run()">
+      <option value="immune">Immune support</option>
+      <option value="tissue">Tissue repair / injury</option>
+      <option value="gut">Gut / barrier</option>
+      <option value="metabolic">Metabolic / weight</option>
+      <option value="cognition">Cognition / mood</option>
+      <option value="skin">Skin &amp; hair</option>
+      <option value="sexual">Sexual function</option>
+      <option value="longevity">Longevity / health optimization</option>
+      <option value="muscle">Muscle building</option>
+      <option value="mito">Mitochondrial / fatigue</option>
+    </select>
+    <h2>Immune picture</h2>
+    <select id="immune" onchange="run()">
+      <option value="unknown">Not characterized</option>
+      <option value="overreactive">Over-reactive / autoimmune-leaning</option>
+      <option value="stuck">Stuck / anergic / recurrent infections</option>
+      <option value="checked_ok">Cytokines checked \u2014 balanced / not over-reactive</option>
+    </select>
+    <h2>Patient factors <span style="font-weight:400;text-transform:none;color:var(--muted)">(click all that apply)</span></h2>
+    <label class="flag"><input type="checkbox" id="malig_active" onchange="run()"> Active malignancy</label>
+    <label class="flag"><input type="checkbox" id="malig_rem" onchange="run()"> Cancer in remission</label>
+    <label class="flag"><input type="checkbox" id="mcas" onchange="run()"> <span class="ab" title="Mast Cell Activation Syndrome">MCAS</span> / highly reactive</label>
+    <label class="flag"><input type="checkbox" id="preg" onchange="run()"> Pregnant / <span class="ab" title="Trying To Conceive">TTC</span> / nursing</label>
+    <label class="flag"><input type="checkbox" id="u30" onchange="run()"> Under 30 years old</label>
+    <label class="flag"><input type="checkbox" id="mtc" onchange="run()"> Personal/family <span class="ab" title="Medullary Thyroid Carcinoma">MTC</span> or <span class="ab" title="Multiple Endocrine Neoplasia type 2">MEN2</span></label>
+    <label class="flag"><input type="checkbox" id="copper" onchange="run()"> Suspected copper overload</label>
+    <label class="flag"><input type="checkbox" id="bipolar" onchange="run()"> Bipolar / activation risk</label>
+    <label class="flag"><input type="checkbox" id="cvd" onchange="run()"> Established cardiovascular disease</label>
+    <label class="flag"><input type="checkbox" id="anticoag" onchange="run()"> On anticoagulation / bleeding risk</label>
+    <label class="flag"><input type="checkbox" id="pancr" onchange="run()"> History of pancreatitis</label>
+    <label class="flag"><input type="checkbox" id="transplant" onchange="run()"> Organ transplant / immunosuppressed</label>
+    <label class="flag"><input type="checkbox" id="retinopathy" onchange="run()"> Diabetic retinopathy</label>
+  </div>
+  <div class="out" id="out"></div>
+</div>
+<div class="foot" id="foot"></div>
+
+<!-- Glossary modal -->
+<div class="modal" id="gloss">
+  <div class="mbox">
+    <span class="close" onclick="document.getElementById('gloss').classList.remove('show')">\u2715</span>
+    <h3>Abbreviations &amp; Glossary</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Every abbreviation used in this tool, spelled out.</p>
+    <div id="glist"></div>
+  </div>
+</div>
+
+<div class="modal" id="refs">
+  <div class="mbox">
+    <span class="close" onclick="document.getElementById('refs').classList.remove('show')">\u2715</span>
+    <h3>References</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Curated key literature behind the entries — the evidence basis, not an exhaustive bibliography. Numbers appear on each peptide card.</p>
+    <div id="rlist"></div>
+  </div>
+</div>
+
+<div class="modal" id="screen">
+  <div class="mbox">
+    <span class="close" onclick="document.getElementById('screen').classList.remove('show')">✕</span>
+    <h3>Malignancy Screening &amp; Lab Monitoring</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Consolidated so you don't have to search — the pre-start screening and the labs to follow, for the peptides that need them.</p>
+    <div style="font-size:13px;line-height:1.55">
+      <p style="font-weight:800;color:var(--navy);margin:8px 0 4px">Before starting — pro-angiogenic (BPC-157, TB-500) &amp; GH-axis (sermorelin, CJC-1295/ipamorelin, tesamorelin), plus Dihexa &amp; the incretins:</p>
+      <ul style="margin:0 0 8px 18px">
+        <li>No active or recent cancer; take a thorough <b>personal AND family</b> cancer history.</li>
+        <li>Confirm <b>age/sex-appropriate cancer screening is current</b>: colonoscopy, mammography, cervical (Pap/HPV), PSA ± DRE, skin exam, low-dose chest CT for eligible smokers.</li>
+        <li><b>GH secretagogues:</b> check <b>IGF-1</b> at baseline and keep it in the upper half of the age range — never above ULN. Supraphysiologic IGF-1 is the modifiable risk; there is no peptide-specific tumor marker.</li>
+        <li><b>Incretins:</b> personal/family <b>MTC or MEN2</b> is a contraindication; check <b>calcitonin only if</b> there's a specific thyroid concern (not routine).</li>
+        <li><b>GHK-Cu:</b> the exception — favorable cancer-gene signature; still coordinate in active cancer.</li>
+        <li><b>Tumor-marker panels</b> (CEA, CA-125, CA 19-9, routine PSA-as-screen) are <b>NOT</b> recommended for general pre-peptide screening — poor specificity/false positives. Screening = history + exam + guideline-based age-appropriate screening.</li>
+      </ul>
+      <p style="font-weight:800;color:var(--navy);margin:10px 0 4px">Lab monitoring at a glance (each card lists specifics):</p>
+      <ul style="margin:0 0 4px 18px">
+        <li><b>GH secretagogues</b> → IGF-1 (baseline, ~1 mo, q3–6 mo) + fasting glucose.</li>
+        <li><b>Incretins</b> → glucose, HbA1c, weight, lipids, GI tolerance; calcitonin only if MTC concern.</li>
+        <li><b>BPC-157 / TB-500</b> → VEGF only on prolonged/systemic use (watch angiogenic drive).</li>
+        <li><b>GHK-Cu</b> → serum copper, ceruloplasmin, zinc:copper ratio; watch copper-overload signs.</li>
+        <li><b>VIP</b> → lipase (pancreatitis) before/during; blood pressure.</li>
+        <li><b>Thymics (TA-1/Thymalin/Thymagen)</b> → symptom response ± cytokine / CD4:CD8 in complex cases.</li>
+        <li><b>PE-22-28</b> → mood/activation; screen bipolarity.</li>
+        <li><b>SS-31 / MOTS-c</b> → HOMA-IR/HbA1c if metabolic; function/fatigue.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+const LV={neutral:0,consider:1,caution:2,avoid:3};
+const TIER={est:["Established","t-est"],emg:["Emerging","t-emg"],mech:["Mechanistic","t-mech"]};
+const GOALNOTE={muscle:"For muscle building you want mTOR-driven anabolism \u2014 GH/IGF-1 peptides (CJC-1295/ipamorelin, sermorelin, tesamorelin) push that way. AMPK activators like MOTS-c pull the opposite direction (AMPK reciprocally suppresses mTOR/protein synthesis), so pulse them and time away from post-workout/protein windows."};
+const GOALPRIORITY={
+ mito:["SS-31 (elamipretide)","NAD+","MOTS-c","ARA-290 (cibinetide)","CJC-1295 + Ipamorelin","Sermorelin"],
+ immune:["Thymalin","Thymagen (Thymogen)","Thymosin alpha-1","KPV","VIP","LL-37","Amlexanox"],
+ tissue:["BPC-157","TB-500 (Thymosin beta-4)","GHK-Cu","CJC-1295 + Ipamorelin","Sermorelin","Tesamorelin","MOTS-c","SS-31 (elamipretide)","KPV"],
+ gut:["Larazotide","KPV","BPC-157","LL-37","Amlexanox"],
+ metabolic:["MOTS-c","Amlexanox","Tirzepatide","Retatrutide","Tesamorelin","Survodutide","Cagrilintide","AOD-9604"],
+ cognition:["Semax","Selank","Dihexa","PE-22-28","DSIP"],
+ skin:["GHK-Cu","OS-01 / ATX-304","KPV"],
+ sexual:["PT-141 (bremelanotide)","Oxytocin"],
+ longevity:["Epitalon","NAD+","MOTS-c","Humanin","GHK-Cu","SS-31 (elamipretide)","Thymagen (Thymogen)"],
+ muscle:["CJC-1295 + Ipamorelin","Sermorelin","Tesamorelin","BPC-157","TB-500 (Thymosin beta-4)","MOTS-c"],
+};
+
+const GLOSSARY={
+  "TTC":"Trying to conceive","MTC":"Medullary thyroid carcinoma","MEN2":"Multiple endocrine neoplasia type 2",
+  "MCAS":"Mast cell activation syndrome","IGF-1":"Insulin-like growth factor 1","Th1 / Th2":"T-helper cell type 1 / type 2 (immune polarization)",
+  "IFN":"Interferon","GH":"Growth hormone","GLP-1":"Glucagon-like peptide-1","GIP":"Glucose-dependent insulinotropic polypeptide",
+  "TREK-1":"TWIK-related potassium channel 1","CIRS":"Chronic inflammatory response syndrome","SC":"Subcutaneous (injection)",
+  "VEGF":"Vascular endothelial growth factor","IL-6 / IL-10":"Interleukin-6 / Interleukin-10","TNF":"Tumor necrosis factor",
+  "NK cell":"Natural killer cell","HSDD":"Hypoactive sexual desire disorder","SFN":"Small-fiber neuropathy","CVD":"Cardiovascular disease",
+  "BID":"Twice daily","NAD+":"Nicotinamide adenine dinucleotide","AMPK":"AMP-activated protein kinase","DSIP":"Delta sleep-inducing peptide",
+  "VIP":"Vasoactive intestinal peptide","ARA-290":"Cibinetide (EPO-derived, non-erythropoietic)","EPO":"Erythropoietin",
+  "GHRH":"Growth hormone-releasing hormone","HGF":"Hepatocyte growth factor","c-Met":"HGF receptor (tyrosine kinase)",
+  "MASH":"Metabolic dysfunction-associated steatohepatitis","MARCoNS":"Multiply antibiotic-resistant coagulase-negative Staphylococcus",
+  "ULN":"Upper limit of normal","HOMA-IR":"Homeostatic model assessment of insulin resistance",
+  "TLR":"Toll-like receptor (innate immune sensor)","CD4 / CD8":"T-helper / cytotoxic T-cell surface markers","NSCLC":"Non-small-cell lung cancer","HCC":"Hepatocellular carcinoma"
+};
+
+// ===== REFERENCES (curated key literature; the evidence basis \u2014 not exhaustive) =====
+const REFS=[
+ {n:1,c:"Pickart L, Thaler MM. Tripeptide in human serum that prolongs survival of normal liver cells. Nat New Biol. 1973;243(126):85-87."},
+ {n:2,c:"Pickart L, Margolina A. Regenerative and protective actions of the GHK-Cu peptide in the light of the new gene data. Int J Mol Sci. 2018;19(7):1987."},
+ {n:3,c:"Maquart FX, et al. Stimulation of collagen synthesis by the tripeptide-copper complex GHK-Cu. FEBS Lett. 1988;238(2):343-346."},
+ {n:4,c:"Chien RN, et al. Thymalfasin (thymosin alpha-1) plus interferon-alpha for chronic hepatitis B: a randomized controlled trial. Hepatology. 1998;27(5):1383-1387 (PMID 9581695)."},
+ {n:5,c:"Wu J, et al. Efficacy of thymosin alpha-1 for severe sepsis (ETASS): a randomized controlled trial \u2014 1.6 mg SC daily \u00d7 7 days. Crit Care. 2013;17(1):R8."},
+ {n:6,c:"Zadaxin (thymalfasin) prescribing information \u2014 approved in 35+ countries for chronic hepatitis B/C and as an immune adjunct in cancer (NSCLC, melanoma, HCC, renal cell); FDA orphan-drug status (melanoma, HCC)."},
+ {n:7,c:"Garaci E, et al. Thymosin alpha-1 as an immunomodulator bridging innate and adaptive immunity \u2014 reviews of NK-cell/dendritic activation and cancer/infection use."},
+ {n:8,c:"Jastreboff AM, et al. Tirzepatide once weekly for obesity (SURMOUNT-1). N Engl J Med. 2022;387(3):205-216. FDA label maximum 15 mg/week."},
+ {n:9,c:"Jastreboff AM, et al. Triple-hormone-receptor agonist retatrutide for obesity \u2014 phase 2 (doses to 12 mg/week). N Engl J Med. 2023;389(6):514-526."},
+ {n:10,c:"Falutz J, et al. Tesamorelin for HIV-associated abdominal fat accumulation. N Engl J Med. 2007;357(23):2359-2370."},
+ {n:11,c:"Sikiric P, et al. Stable gastric pentadecapeptide BPC-157: cytoprotection and tissue healing \u2014 review series. Curr Pharm Des / J Physiol Pharmacol."},
+ {n:12,c:"Goldstein AL, Kleinman HK. Advances in the basic and clinical applications of thymosin beta-4 (TB-500). Expert Opin Biol Ther / Ann N Y Acad Sci."},
+ {n:13,c:"Mazella J, et al. Spadin, a sortilin-derived peptide targeting TREK-1 channels: a new concept in antidepressant drug design. PLoS Biol. 2010;8(4):e1000355."},
+ {n:14,c:"Djillani A, et al. Shortened spadin analogs (PE 22-28) with improved TREK-1 inhibition and antidepressant activity. Front Pharmacol. 2017;8:643."},
+ {n:15,c:"Lee C, et al. The mitochondrial-derived peptide MOTS-c promotes metabolic homeostasis and AMPK activation. Cell Metab. 2015;21(3):443-454 (and related mitochondrial-derived-peptide work, incl. humanin)."},
+ {n:16,c:"Khavinson VK, et al. Peptide bioregulators (Epitalon, Thymalin, Thymogen): experimental and clinical studies. Bull Exp Biol Med / Neuro Endocrinol Lett."},
+ {n:17,c:"Szeto HH. Cardiolipin-protective compound SS-31 (elamipretide): mechanism and clinical development. Br J Pharmacol; Barth-syndrome and dry-AMD trials."},
+ {n:18,c:"Brines M, Cerami A. Innate-repair-receptor agonist ARA-290 (cibinetide); Dahan A, et al. cibinetide in sarcoidosis small-fiber neuropathy."},
+ {n:19,c:"Leffler DA, et al. Larazotide acetate for persistent symptoms of celiac disease \u2014 randomized trials. Gastroenterology; Fasano A, zonulin/tight-junction literature."},
+ {n:20,c:"Kingsberg SA, et al. Bremelanotide (PT-141) for hypoactive sexual desire disorder (RECONNECT). Obstet Gynecol. 2019; Vyleesi prescribing information."},
+ {n:21,c:"Semax and Selank: Russian clinical and experimental literature on nootropic and anxiolytic neuropeptides (used clinically in the Russian Federation)."},
+ {n:22,c:"Practice evidence basis: A4M Peptide Certification curriculum and the Peptides, Practiced. teaching-volume library (Monika Rodriguez, FNP-C)."},
+ {n:23,c:"Shoemaker RC. Vasoactive intestinal polypeptide (VIP) in CIRS-WDB: intranasal protocol with in-office first-dose TGF-\u03b21/C4a testing, correction of TGF-\u03b21/C4a/MMP-9/VEGF, and lipase (pancreatitis) monitoring. SurvivingMold protocol."},
+ {n:24,c:"Thymogen (Glu-Trp / EW dipeptide; Khavinson) \u2014 registered immunomodulator in the Russian Federation (Cytomed, reg. P N000313/01); intranasal 25 mcg and injectable 100 mcg/mL; clinical protocol 100 mcg IM/SC daily \u00d7 3\u201310 days."},
+ {n:25,c:"GLP-1 dosing & microdosing basis: LaValle GLP-1 lecture (trial-dose start \u2014 tirzepatide 2.5 mg, retatrutide 2 mg \u2014 then titrate to effect, don\u2019t chase the maximum) and peer clinical microdosing experience (tirzepatide ~1 mg SC 2\u00d7/week from 18 mg/mL compounded for MCAS/anti-inflammatory use; titrate frequency not dose; explicitly not for weight loss)."},
+ {n:26,c:"LL-37 (human cathelicidin): antiviral vs influenza / RSV / HIV / SARS-CoV-2 via viral-envelope disruption (Barlow et al. PLoS ONE 2011; plus RSV and HIV studies) and antifungal vs Candida (incl. C. auris); Gr\u00f6nberg et al. 2014 \u2014 two RCTs of topical LL-37 accelerating venous-leg-ulcer healing."},
+ {n:27,c:"Amlexanox: small-molecule IKK\u03b5/TBK1 inhibitor (FDA-approved topically as Aphthasol for aphthous ulcers). Reilly SM et al., Nat Med 2013 \u2014 reverses obesity / insulin resistance / hepatic steatosis in mice; Oral EA et al., Cell Metab 2017 \u2014 Phase 2 RCT in T2D/NAFLD with HbA1c reduction in a responder subset."},
+];
+const PREFS={
+ "Thymalin":[16,22],"Thymosin alpha-1":[4,5,6,7],"Thymagen (Thymogen)":[16,24,22],
+ "BPC-157":[11,22],"TB-500 (Thymosin beta-4)":[12,22],"KPV":[22],"GHK-Cu":[1,2,3],
+ "CJC-1295 + Ipamorelin":[22],"Tesamorelin":[10],"Sermorelin":[22],"AOD-9604":[22],
+ "Tirzepatide":[8,25],"Retatrutide":[9,25],"Survodutide":[22],"Cagrilintide":[22],
+ "MOTS-c":[15],"SS-31 (elamipretide)":[17],"Humanin":[15],"NAD+":[22],
+ "Selank":[21],"Semax":[21],"PE-22-28":[13,14],"DSIP":[22],"Dihexa":[22],
+ "PT-141 (bremelanotide)":[20],"ARA-290 (cibinetide)":[18],"Oxytocin":[22],
+ "Epitalon":[16],"VIP":[23,22],"LL-37":[26,22],"Larazotide":[19],"OS-01 / ATX-304":[22],"Amlexanox":[27],
+};
+
+// peptide name -> duration & cycling guidance (how long, breaks)
+const CYCLE={
+ "Thymalin":"10-day loading course, then 2\u20133\u00d7/week; run 3\u20134-week blocks, repeat 2\u20134\u00d7/year. Durable bioregulator effect \u2014 long breaks between courses are fine.",
+ "Thymosin alpha-1":"Acute illness: short ~7-day courses. Maintenance/immune support: 2×/week for 4–8-week blocks, then a 2–4-week break (or continue in higher-risk patients). Cancer adjunct: through chemotherapy cycles.",
+ "Thymagen (Thymogen)":"3\u201310-day courses, repeated up to ~4\u00d7/year. Durable effect \u2014 long breaks between courses are expected, not continuous use.",
+ "BPC-157":"Injury/repair course ~4\u20136 weeks (extend for ongoing healing), then stop. Not a lifelong daily peptide \u2014 cycle off once healed; re-course as needed.",
+ "TB-500 (Thymosin beta-4)":"Loading (2.5–5 mg 2×/wk) then 500 mcg maintenance across the ~4–6-week repair window post-injury/surgery; taper off once healed — not indefinite. Reserve VEGF checks for prolonged use.",
+ "KPV":"Run through the active inflammatory flare (~2\u20136 weeks); targeted use, not indefinite.",
+ "GHK-Cu":"Injectable in 4–8-week courses with ~2–4-week breaks between; topical can run ongoing. Durable matrix effects — no need for continuous injectable use.",
+ "CJC-1295 + Ipamorelin":"5 days on / 2 off weekly; run 3\u20136-month blocks, then a 4\u20138-week break to preserve pituitary sensitivity. Monitor IGF-1.",
+ "Tesamorelin":"Continuous while actively reducing visceral fat; reassess at 3\u20136 months and consider a break. Monitor IGF-1.",
+ "Sermorelin":"5 days on / 2 off weekly; 3\u20136-month blocks with periodic breaks to preserve pituitary responsiveness. Monitor IGF-1.",
+ "AOD-9604":"8\u201312-week fat-loss courses, then break and reassess; re-course as needed.",
+ "Tirzepatide":"Long-term therapy expected (chronic metabolic condition). Titrate to effect, then hold at a maintenance dose; taper rather than stop abruptly if discontinuing.",
+ "Retatrutide":"Long-term/ongoing while indicated (investigational); titrate to a maintenance dose and hold at lowest effective.",
+ "Survodutide":"Ongoing while indicated (investigational); titrate to maintenance.",
+ "Cagrilintide":"Ongoing while indicated (investigational), often as a combination partner; titrate to maintenance.",
+ "MOTS-c":"2–3×/week for ~4–8 weeks, then a 2–4-week break; reassess and repeat as needed — pulsed, not continuous.",
+ "SS-31 (elamipretide)":"~20 days on per cycle, then ~10–14 days off; repeat cycles as needed — not continuous.",
+ "Humanin":"Cycle in short blocks with breaks; not standardized \u2014 reassess between courses.",
+ "NAD+":"IV loading series (several sessions over 1\u20132 weeks), then maintenance (e.g., monthly IV or daily precursor). Repeat series as needed.",
+ "Selank":"2\u20134-week courses or PRN; intermittent use with breaks \u2014 not continuous long-term.",
+ "Semax":"2\u20134-week courses or PRN; intermittent with breaks between courses.",
+ "PE-22-28":"Short cycles, start low; intermittent \u2014 not for continuous long-term use.",
+ "DSIP":"PRN or short courses for sleep resets; intermittent, not nightly indefinitely.",
+ "Dihexa":"Short defined courses for a cognitive target; cycle with breaks \u2014 not open-ended daily use.",
+ "PT-141 (bremelanotide)":"As-needed before activity \u2014 not scheduled daily. Max 1 dose/24 h and \u22648 doses/month.",
+ "ARA-290 (cibinetide)":"Sarcoidosis small-fiber neuropathy & diabetic neuropathy: 4 mg daily for ~4-week courses (trial length); symptoms improve by ~4 weeks, nerve regeneration is slower so run 2–3+ months, then reassess and taper. Break between courses if maintenance.",
+ "Oxytocin":"As-needed/intermittent; not a scheduled daily maintenance peptide.",
+ "Epitalon":"10\u201320-day course, 1\u20132\u00d7/year. Durable epigenetic effect \u2014 months-long breaks are the norm, not continuous use.",
+ "VIP":"Continue until residual symptoms and markers normalize \u2014 some patients ~1 month, others >1 year; stop once well. Not indefinite.",
+ "LL-37":"Short, targeted 2\u20134-week courses; not chronic use.",
+ "Larazotide":"Use during active barrier repair (weeks\u2013months); reassess and taper as the barrier heals.",
+ "OS-01 / ATX-304":"Ongoing topical maintenance (cosmetic/skin-quality use).",
+ "Amlexanox":"Topical: apply to lesions until healed. Oral metabolic: ~12-week courses (per the trial), reassess responders; well tolerated longer-term.",
+};
+function openRefs(){document.getElementById('refs').classList.add('show');}
+
+
+// PEPTIDE KNOWLEDGE BASE (dosing = reference from library; verify & individualize)
+const P=[
+ {n:"Thymalin",vol:"V02",k:"Thymic bioregulator",goals:["immune"],tier:"emg",
+  mech:"Bidirectional thymic polypeptide — restores the CD4/CD8 balance, shifts Th1\u2192Th2, calms IL-2/IFN-\u03b3 without immunosuppression.",
+  dose:"10 mg SC daily \u00d7 10-day load, then 2\u20133\u00d7/week maintenance.",
+  monitor:"Symptom response; consider TH-polarization / cytokine panel in complex immune cases.",
+  cautions:"Well tolerated; limited pregnancy data.",
+  indReason:"The bidirectional normalizer — the default for a dysregulated immune picture.",
+  rules:[
+   {when:f=>f.transplant,level:"avoid",reason:"Immune activator \u2014 avoid with transplant immunosuppression (works against the required immunosuppression / rejection risk); coordinate with the transplant team.",alt:""},
+   {when:f=>f.immune==="overreactive",level:"consider",reason:"First choice here \u2014 calms the overactive side without flogging it."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data \u2014 weigh carefully.",alt:"Defer immune peptides in pregnancy unless clearly indicated."}]},
+
+ {n:"Thymosin alpha-1",abbr:"TA-1",vol:"V02",k:"Thymic peptide",goals:["immune"],tier:"est",
+  mech:"Immune modulator bridging innate and adaptive immunity via TLR (Toll-like receptor) signaling \u2014 it drives T-cell maturation (CD4/CD8), dendritic-cell activation, NK-cell cytotoxicity and IFN-\u03b3/IL-2, but ALSO restores immune homeostasis (raises IL-10, lowers TNF-\u03b1/IL-6, supports the Th17/Treg balance). So it is a balance-restorer with a Th1-leaning edge, not a pure accelerator. Approved as Zadaxin/thymalfasin in 35+ countries for hepatitis B/C and as a cancer immune adjunct.",
+  dose:"Maintenance / immune support: 1.0\u20131.6 mg SC 2\u00d7/week. Acute or severe illness: higher and more frequent \u2014 1.6 mg SC daily, up to 1.6 mg every 12 h (~3.2 mg/day), in short ~7-day courses (per sepsis trial protocols). Cancer adjunct: dosed between chemotherapy cycles per protocol.",
+  monitor:"Watch for over-activation (insomnia, 'wired' feeling, autoimmune flare) in reactive patients.",
+  cautions:"Has a Th1-leaning edge that can over-activate a sensitive/reactive patient (start low) \u2014 but it also raises IL-10/Tregs and lowers TNF-\u03b1/IL-6, so it is a balance-restorer, NOT categorically contraindicated in autoimmune-leaning states. Use thoughtfully and ideally cytokine-guided; be more cautious in strongly Th1/granulomatous disease (e.g., sarcoidosis) or an active flare.",
+  indReason:"The activator \u2014 the confident choice for a stuck, anergic, low, or antiviral immune system.",
+  rules:[
+   {when:f=>f.transplant,level:"avoid",reason:"Immune activator \u2014 avoid with transplant immunosuppression (works against the required immunosuppression / rejection risk); coordinate with the transplant team.",alt:""},
+   {when:f=>f.immune==="overreactive",level:"caution",reason:"Th1-leaning edge, but a balance-restorer (raises IL-10/Tregs, lowers TNF-\u03b1/IL-6) \u2014 not an automatic no in autoimmune-leaning states. Use thoughtfully and ideally cytokine-guided; more cautious in Th1/granulomatous disease (e.g., sarcoidosis) or an active flare. Thymalin remains the gentler lead.",alt:"Consider <b>Thymalin</b> (bidirectional normalizer) as the lead; <b>Thymagen</b> for a gentle option."},
+   {when:f=>f.immune==="stuck",level:"consider",reason:"The activator you want for a stuck, anergic, or antiviral immune system \u2014 this is its lane."},
+   {when:f=>f.immune==="checked_ok",level:"consider",reason:"Cytokines confirm it's not a Th1-hot picture \u2014 proceed; a lower starting dose is reasonable in a sensitive patient."},
+   {when:f=>f.malig_active,level:"consider",reason:"Used internationally as a cancer immune adjunct \u2014 augments NK-cell cytotoxicity against tumor cells and reverses chemo-induced immunosuppression; coordinate with oncology."},
+   {when:f=>f.mcas,level:"caution",reason:"Reactive (mast-cell) phenotype \u2014 start at a lower dose.",alt:"Or <b>Thymagen</b> (gentler) if you prefer."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data.",alt:"Defer unless clearly indicated."}]},
+
+ {n:"Thymagen (Thymogen)",vol:"V02",k:"Dipeptide bioregulator",goals:["immune"],tier:"emg",
+  mech:"Glu-Trp dipeptide (the smallest active fragment of Thymalin) \u2014 stimulates thymulin, normalizes the CD4/CD8 and Th1/Th2 balance, and improves NK-cell activity; gentle and anti-inflammatory (lowers IL-6/TNF, raises IL-10).",
+  dose:"SC or IM 100 mcg daily for 3\u201310-day courses (Russian approved protocol; practical range 50\u2013100 mcg/day), repeated up to ~4\u00d7/year \u2014 SC is the more common clinical route. Intranasal 25 mcg/dose 2\u00d7/day is the alternative. (Not currently US-compoundable \u2014 research-grade; verify sourcing.)",
+  monitor:"Symptom response; well tolerated over decades of Russian clinical use.",
+  cautions:"Caution in active autoimmunity (T-cell stimulation may exacerbate); avoid with transplant immunosuppression; limited pregnancy data.",
+  indReason:"Gentlest and most anti-inflammatory of the three thymics \u2014 reactive or exhausted patients, and maintenance.",
+  rules:[
+   {when:f=>f.transplant,level:"avoid",reason:"Immune activator \u2014 avoid with transplant immunosuppression (works against the required immunosuppression / rejection risk); coordinate with the transplant team.",alt:""},
+   {when:f=>true,level:"consider",reason:"Gentle immune modulation (\u2193IL-6/TNF, \u2191IL-10; normalizes CD4/CD8) \u2014 well suited to reactive or immune-exhausted patients."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"BPC-157",vol:"V03",k:"Regenerative",goals:["tissue","gut","muscle"],tier:"emg",
+  mech:"Cytoprotective/angiogenic peptide \u2014 VEGFR2/eNOS signaling; accelerates tendon, gut, and vascular healing.",
+  dose:"250–500 mcg SC daily (local or systemic); some protocols 500–1000 mcg. IV is used in some clinics — a small human pilot used 10 mg then 20 mg IV infusions with no measurable biomarker changes; IV gives systemic reach but a brief peak-and-clear, and human IV data is minimal — and because IV is systemic and the peptide is pro-angiogenic, malignancy screening matters especially here. Course 4–6+ weeks.",
+  monitor:"BPC-157 UPREGULATES VEGF/VEGFR2 and promotes angiogenesis (documented, rodent) — the effect is a rise, not a fall. Reserve VEGF checks for prolonged/systemic courses; the concern with prolonged use is sustained angiogenic drive (also why malignancy screening matters), and a healed target or persistently elevated VEGF argues for a holiday. (The older ‘compensatory VEGF suppression’ idea isn’t well-supported in the literature.)",
+  cautions:"Angiogenic \u2014 malignancy screen. Category 2 history / verify sourcing & pathway.",
+  indReason:"First-line tissue-repair and gut-barrier peptide.",
+  rules:[
+   {when:f=>f.malig_active,level:"avoid",reason:"Pro-angiogenic \u2014 avoid in active malignancy (theoretical tumor-fueling; no human cancer safety data).",alt:"For regeneration with cancer concern, <b>GHK-Cu</b> carries a favorable cancer-gene signature \u2014 coordinate with oncology."},
+   {when:f=>f.malig_rem,level:"caution",reason:"Case-by-case in remission \u2014 weigh risk and coordinate.",alt:"Consider <b>GHK-Cu</b>; document oncology coordination."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"TB-500 (Thymosin beta-4)",vol:"V07",k:"Regenerative",goals:["tissue","muscle"],tier:"emg",
+  mech:"Actin-regulating repair peptide \u2014 cell migration, angiogenesis, anti-fibrotic remodeling; pairs with BPC-157.",
+  dose:"Post-injury/surgery LOADING: 2.5–5 mg SC 2×/week for ~4–6 weeks — the higher load is what drives the repair cascade (actin regulation → cell migration of fibroblasts/endothelial/immune cells → angiogenesis → remodeling). MAINTENANCE: ~500 mcg SC, 5 days on — sustains repair but a maintenance dose alone doesn’t reach the threshold to launch that systemic cascade. IV thymosin β4 has been dosed in trials (cardiac RGN-352, 450–1200 mg IV push) — high-dose research use; some clinics use IV for systemic reach — systemic/IV use amplifies angiogenic exposure, so malignancy-screen first.",
+  monitor:"Promotes angiogenesis — VEGF/angiogenic drive goes up, not down. Reserve VEGF checks for prolonged use; sustained angiogenic drive is the concern (malignancy screen). Track healing and stop/holiday once the target is repaired.",
+  cautions:"Angiogenic \u2014 malignancy screen.",
+  indReason:"Systemic tissue-repair partner to BPC-157.",
+  rules:[
+   {when:f=>f.malig_active,level:"avoid",reason:"Pro-angiogenic \u2014 avoid in active malignancy.",alt:"<b>GHK-Cu</b> (favorable oncologic signature) for regeneration; coordinate oncology."},
+   {when:f=>f.malig_rem,level:"caution",reason:"Case-by-case in remission.",alt:"Consider <b>GHK-Cu</b>."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"KPV",vol:"V03",k:"Anti-inflammatory tripeptide",goals:["gut","skin","immune"],tier:"emg",
+  mech:"\u03b1-MSH fragment / MC1R agonist \u2014 blocks NF-\u03baB and TNF, promotes IL-10; calms mucosal and skin inflammation.",
+  dose:"250\u2013500 mcg SC or oral/topical BID.",
+  monitor:"Symptom response (gut, skin, mucosal).",
+  cautions:"Well tolerated; limited pregnancy data.",
+  indReason:"Non-angiogenic anti-inflammatory \u2014 gut, skin, and mucosal inflammation.",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"GHK-Cu",vol:"V11",k:"Copper tripeptide",goals:["skin","tissue","longevity"],tier:"emg",
+  mech:"Copper-binding tripeptide \u2014 DNA-level repair modulator (\u2248 4,000 genes); collagen/ECM, anti-inflammatory, vascular, favorable cancer-gene signature.",
+  dose:"Topical 0.05\u20130.3% (after microneedling). Injectable 1\u20132 mg SC daily, or 2\u20135 mg 2\u20133\u00d7/week. Copper-free option for sensitive/high-copper patients.",
+  monitor:"Check serum copper, ceruloplasmin, and the zinc:copper ratio on extended/systemic use. Watch for copper-overload signs — anxiety, irritability, insomnia or racing thoughts; nausea or a metallic taste; fatigue/headache; and (severe/rare) liver dysfunction. Stinging with copper-containing forms.",
+  cautions:"Delivers copper — don’t add it to suspected copper overload (use the copper-free form there). It carries copper in a redox-quenched, non-toxic complex, so it rarely drives frank toxicity at typical doses. NOT a treatment for copper deficiency — the delivered copper is small and complexed; correct true (e.g., zinc-induced) deficiency with oral copper repletion plus reducing the excess zinc. Injectable is off-label/emerging (2026 compounding pending).",
+  indReason:"Central skin/hair and matrix-repair peptide.",
+  rules:[
+   {when:f=>f.copper,level:"avoid",reason:"Delivers copper \u2014 avoid in suspected copper overload; check zinc:copper first.",alt:"Use <b>copper-free GHK</b>; or <b>TB-500 / BPC-157</b> for tissue goals."},
+   {when:f=>f.malig_active,level:"consider",reason:"Favorable cancer-gene signature (down-regulates metastatic, up-regulates apoptosis genes) \u2014 often acceptable oncology-adjacent; coordinate."},
+   {when:f=>f.mcas,level:"caution",reason:"Start low in reactive patients."}]},
+
+ {n:"CJC-1295 + Ipamorelin",vol:"V05",k:"GH secretagogue",goals:["tissue","longevity","mito","muscle"],tier:"emg",
+  mech:"GHRH analog + ghrelin-mimetic \u2014 pulsatile GH release, raising IGF-1; body composition, recovery, sleep.",
+  dose:"~100 mcg each SC at night, 5 days/week. Requires a \u22652-hour fast before dosing.",
+  monitor:"IGF-1 (steer to upper-half of age range, not above ULN), fasting glucose.",
+  cautions:"Raises IGF-1 \u2014 cancer screen; avoid under 30 with an intact axis. Not FDA-approved (compounded; human PK data exists) \u2014 tesamorelin is the FDA-approved GHRH alternative. No published RCT of the combination itself.",
+  indReason:"GH-axis support for recovery, body composition, and sleep.",
+  rules:[
+   {when:f=>f.malig_active||f.malig_rem,level:"avoid",reason:"Raises IGF-1 \u2014 avoid with any cancer concern.",alt:"For tissue goals with cancer concern, <b>GHK-Cu</b> (favorable signature) or <b>MOTS-c</b>; coordinate oncology."},
+   {when:f=>f.u30,level:"caution",reason:"Generally avoid under 30 unless a documented GH deficiency."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy.",alt:"Defer GH-axis peptides."}]},
+
+ {n:"Tesamorelin",vol:"V05",k:"GHRH analog",goals:["metabolic","longevity","muscle"],tier:"est",
+  mech:"Stabilized GHRH — reduces visceral adipose tissue; the ONLY FDA-approved GH secretagogue (Egrifta, 2010; Phase 3 RCTs).",
+  dose:"1\u20132 mg SC daily.",
+  monitor:"IGF-1, fasting glucose.",
+  cautions:"Raises IGF-1 \u2014 cancer screen.",
+  indReason:"Visceral-fat-predominant metabolic support.",
+  rules:[
+   {when:f=>f.malig_active||f.malig_rem,level:"avoid",reason:"Raises IGF-1 \u2014 avoid with any cancer concern.",alt:"<b>MOTS-c</b> or an incretin (if no MTC/MEN2) for metabolic goals."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."}]},
+
+ {n:"Tirzepatide",vol:"V06",k:"GLP-1/GIP incretin",goals:["metabolic"],tier:"est",
+  mech:"Dual GLP-1/GIP agonist \u2014 glycemic control, appetite, weight; also used low-dose for inflammation/MCAS.",
+  dose:"Standard start: 2.5 mg SC weekly (trial dose), 5 mg after 4 weeks. Then titrate personally \u2014 smallest effective steps by response, hold at the lowest effective dose; most do well at 2.5\u20137.5 mg, rarely needing 15 mg (ceiling). Don\u2019t chase the label\u2019s fixed 2.5 mg-every-4-weeks schedule. \u2022 Microdosing (anti-inflammatory / MCAS / metabolic \u2014 NOT weight loss): ~1 mg SC 2\u00d7/week (0.05 mL of 18 mg/mL compounded); titrate FREQUENCY not dose (to 3\u00d7/week or every other day); very sensitive or pediatric start 0.25\u20130.5 mg. Watch for unwanted weight loss \u2014 reduce or stop if it occurs. Note: microdosing (any dose below the 2.5 mg trial floor) is empirical clinical practice — pharmacologic and clinical-experience based, not RCT-studied.",
+  monitor:"Glucose, HbA1c, weight, GI tolerance; watch unwanted weight loss in non-weight cases.",
+  cautions:"Contraindicated with MTC/MEN2. The one class that warrants real metabolic monitoring.",
+  indReason:"Approved incretin \u2014 titrate strictly by response.",
+  rules:[
+   {when:f=>f.pancr,level:"caution",reason:"History of pancreatitis \u2014 case-by-case, not an automatic no. Weigh the cause and course: a remote, resolved gallstone episode is very different from recurrent, idiopathic, or hypertriglyceridemic pancreatitis (the latter argue against a GLP-1). Trials excluded prior pancreatitis as a precaution; use judgment, and monitor.",alt:"If you\u2019d rather avoid the class: <b>Cagrilintide</b> (amylin analog) doesn\u2019t carry the pancreatitis signal; or <b>MOTS-c</b> (non-incretin)."},
+   {when:f=>f.retinopathy,level:"caution",reason:"Rapid glucose-lowering can transiently worsen diabetic retinopathy \u2014 titrate slowly and coordinate ophthalmology."},
+   {when:f=>f.mtc,level:"avoid",reason:"Contraindicated with personal/family MTC or MEN2.",alt:"Non-incretin metabolic support: <b>MOTS-c</b>, or <b>tesamorelin</b> (if no cancer concern)."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."},
+   {when:f=>true,level:"consider",reason:"Titrate by response; hold at the lowest effective dose."}]},
+
+ {n:"Retatrutide",vol:"V06",k:"Triple incretin (investigational)",goals:["metabolic"],tier:"emg",
+  mech:"GLP-1/GIP/glucagon triple agonist \u2014 potent weight/metabolic effects. In Phase 3 trials (TRIUMPH), not yet FDA-approved \u2014 the caution here reflects investigational status + the need for metabolic monitoring, not a unique safety risk.",
+  dose:"Standard start: 2 mg SC weekly (trial dose). Then titrate in small personalized steps by response \u2014 not the trial\u2019s fixed 4/9/12 mg jumps; strong benefit is often reached by 4 mg; ceiling 12 mg/week. Dose to the goal and plan the exit. Myalgia is a class effect (lower dose + ketone esters). \u2022 Microdosing: emerging \u2014 low weekly doses for metabolic/anti-inflammatory benefit, framed as non-weight-loss (same guardrails as tirzepatide); titrate frequency to response.",
+  monitor:"Glucose, HbA1c, weight, GI tolerance, myalgia.",
+  cautions:"Investigational (not FDA-approved); MTC/MEN2 screen.",
+  indReason:"Potent metabolic option \u2014 investigational.",
+  rules:[
+   {when:f=>f.pancr,level:"caution",reason:"History of pancreatitis \u2014 case-by-case, not an automatic no. Weigh the cause and course: a remote, resolved gallstone episode is very different from recurrent, idiopathic, or hypertriglyceridemic pancreatitis (the latter argue against a GLP-1). Trials excluded prior pancreatitis as a precaution; use judgment, and monitor.",alt:"If you\u2019d rather avoid the class: <b>Cagrilintide</b> (amylin analog) doesn\u2019t carry the pancreatitis signal; or <b>MOTS-c</b> (non-incretin)."},
+   {when:f=>f.retinopathy,level:"caution",reason:"Rapid glucose-lowering can transiently worsen diabetic retinopathy \u2014 titrate slowly and coordinate ophthalmology."},
+   {when:f=>f.mtc,level:"avoid",reason:"Screen out MTC/MEN2.",alt:"<b>MOTS-c</b> or approved <b>tirzepatide</b> (still MTC-screened)."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."},
+   {when:f=>true,level:"caution",reason:"Investigational \u2014 not FDA-approved; titrate by response."}]},
+
+ {n:"MOTS-c",vol:"V01",k:"Mitochondrial peptide",goals:["metabolic","longevity","mito","tissue","muscle"],tier:"mech",
+  mech:"Mitochondrial-derived peptide \u2014 activates AMPK; improves insulin sensitivity and metabolic resilience.",
+  dose:"10 mg SC 2\u20133\u00d7/week.",
+  monitor:"HOMA-IR, HbA1c if metabolic goal.",
+  cautions:"Well tolerated; limited pregnancy data. AMPK caution: MOTS-c activates AMPK, which reciprocally suppresses mTOR/anabolism \u2014 excessive or continuous activation can blunt muscle protein synthesis, so pulse/cycle it (2\u20133\u00d7/week, not continuous) and be mindful when muscle-building is the goal or in catabolic/frail patients. Sequencing: optimize/address the mitochondrial membrane (SS-31) first or as needed \u2014 don\u2019t push AMPK and fuel onto a compromised membrane.",
+  indReason:"Metabolic/mitochondrial resilience without IGF-1 or cancer concern.",
+  rules:[
+   {when:f=>f.goal==="muscle",level:"caution",reason:"AMPK activation suppresses the mTOR-driven anabolism you\u2019re trying to build \u2014 not ideal as a muscle-building agent; if used, time it well away from post-workout and protein (anabolic) windows.",alt:"For muscle, favor the GH/IGF-1 peptides (CJC-1295/ipamorelin, sermorelin)."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"SS-31 (elamipretide)",vol:"V01",k:"Mitochondrial peptide",goals:["mito","tissue"],tier:"emg",
+  mech:"Cardiolipin-targeted \u2014 stabilizes the inner mitochondrial membrane, restores bioenergetics.",
+  dose:"5\u201310 mg SC daily, ~20-day cycles.",
+  monitor:"You\u2019re monitoring for IMPROVEMENT \u2014 energy, exercise tolerance, and function should get better over the cycle; that rising trend is how you confirm it\u2019s working (it\u2019s the response measure, not a side effect). Ceiling of effect is limited by mitochondrial linoleic-PE availability.",
+  cautions:"Well tolerated; limited pregnancy data. SEQUENCING: start SS-31 BEFORE MOTS-c \u2014 SS-31 stabilizes the mitochondrial membrane/cardiolipin (repairs the machinery), and MOTS-c then activates and fuels metabolism. You can\u2019t add fuel to mitochondria that aren\u2019t working yet.",
+  indReason:"Mitochondrial dysfunction, fatigue, and post-viral/CIRS energetics.",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Selank",vol:"V08",k:"Anxiolytic neuropeptide",goals:["cognition"],tier:"emg",
+  mech:"Tuftsin analog \u2014 anxiolytic and immunomodulatory; balances GABA/serotonin tone. Russian clinical use.",
+  dose:"250\u2013500 mcg intranasal or SC daily.",
+  monitor:"Mood/anxiety response.",
+  cautions:"Well tolerated; limited pregnancy data.",
+  indReason:"Anxiety, stress, and calm cognitive support.",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Semax",vol:"V08",k:"Nootropic neuropeptide",goals:["cognition"],tier:"emg",
+  mech:"ACTH(4-10) analog \u2014 raises BDNF, neuroprotective; clinical stroke/cognition use in Russia.",
+  dose:"300\u2013600 mcg intranasal daily (divided).",
+  monitor:"Cognitive/mood response.",
+  cautions:"Well tolerated; limited pregnancy data.",
+  indReason:"Focus, memory, and neuroprotective cognitive support.",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"PE-22-28",vol:"V08",k:"TREK-1 blocker",goals:["cognition"],tier:"mech",
+  mech:"Spadin-derived TREK-1 channel blocker \u2014 rapid neurogenesis/synaptogenesis; biphasic (low dose activates, higher inhibits).",
+  dose:"Reference 100\u2013300 mcg SC or intranasal; dose is the key variable given the biphasic response \u2014 start low.",
+  monitor:"Mood/activation; screen bipolarity; titrate carefully.",
+  cautions:"Biphasic dose-response \u2014 low dose activates TREK-1, higher inhibits; verify current sourcing/compounding status.",
+  indReason:"Fast-acting neuroplasticity mechanism for mood/cognition.",
+  rules:[
+   {when:f=>f.bipolar,level:"avoid",reason:"Neuroactive with a biphasic dose-response \u2014 screen for bipolarity; high activation risk.",alt:"<b>Selank</b> or <b>Semax</b> (gentler neuromodulators) with psychiatric coordination."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."},
+   {when:f=>true,level:"caution",reason:"Biphasic dose-response \u2014 dose is the key safety variable; start low."}]},
+
+ {n:"DSIP",vol:"V08",k:"Sleep peptide",goals:["cognition"],tier:"mech",
+  mech:"Delta sleep-inducing peptide \u2014 modulates sleep architecture and stress-axis tone.",
+  dose:"100\u2013300 mcg SC at night (reference).",
+  monitor:"Sleep quality/latency.",
+  cautions:"Well tolerated; limited pregnancy data.",
+  indReason:"Sleep-onset and sleep-quality support.",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"PT-141 (bremelanotide)",vol:"V08",k:"Melanocortin agonist",goals:["sexual"],tier:"est",
+  mech:"MC4R agonist \u2014 central arousal pathway; FDA-approved for HSDD.",
+  dose:"1.75 mg SC ~45 min before anticipated activity (Vyleesi label); max 1 dose/24 h and \u22648 doses/month. Peptide protocols often use less (0.5\u20132 mg). Use lowest effective.",
+  monitor:"Blood pressure (transient rise), nausea, flushing.",
+  cautions:"Transient BP elevation \u2014 caution in uncontrolled hypertension/CVD.",
+  indReason:"Central sexual-arousal support (male and female).",
+  rules:[
+   {when:f=>f.cvd,level:"caution",reason:"Causes a transient blood-pressure rise \u2014 caution with established CVD/uncontrolled hypertension; monitor BP.",alt:"If BP is a concern, address vascular/hormonal drivers first."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."}]},
+
+ {n:"ARA-290 (cibinetide)",vol:"V04",k:"Innate-repair receptor agonist",goals:["mito","tissue"],tier:"emg",
+  mech:"Non-erythropoietic EPO-derived peptide \u2014 innate-repair receptor; anti-inflammatory and neuroprotective for small-fiber/neuropathic pain.",
+  dose:"4 mg SC daily is the trial-validated therapeutic dose (Phase 2 sarcoidosis small-fiber neuropathy and type 2 diabetic neuropathy, 28-day courses) \u2014 1 mg was sub-effective on nerve endpoints and 8 mg didn\u2019t beat 4 mg. IV alternative: 2 mg 3\u00d7/week. Reconstitution ref: 16 mg in 2 mL = 8 mg/mL, so 4 mg = 0.5 mL (50 units).",
+  monitor:"Neuropathic symptom response; no erythropoietic effect.",
+  cautions:"Well tolerated; limited pregnancy data.",
+  indReason:"Small-fiber neuropathy, dysautonomia, neuropathic pain.",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Epitalon",vol:"V10",k:"Pineal bioregulator",goals:["longevity"],tier:"emg",
+  mech:"Khavinson tetrapeptide \u2014 telomerase/circadian support; favorable oncologic signal in models.",
+  dose:"5\u201310 mg SC daily \u00d7 10\u201320 day cycle (verify \u00b5g vs mg convention).",
+  monitor:"Sleep/circadian; longevity markers if tracked.",
+  cautions:"Bioregulator \u2014 durable epigenetic effect; limited pregnancy data.",
+  indReason:"Circadian/longevity bioregulation.",
+  rules:[
+   {when:f=>f.malig_active,level:"consider",reason:"Bioregulators show a favorable oncologic signal (reduced tumor incidence in models)."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"NAD+",vol:"V01",k:"Mitochondrial coenzyme",goals:["mito","cognition","longevity","metabolic"],tier:"emg",
+  mech:"Central coenzyme for mitochondrial energy, sirtuin activity, and DNA repair \u2014 declines with age; restores cellular energetics.",
+  dose:"IV 250\u2013750 mg per session (infuse slowly); SC or intranasal precursor protocols as reference.",
+  monitor:"Tolerance \u2014 flushing, chest tightness, nausea if infused too fast (slow the drip).",
+  cautions:"Infuse slowly; well tolerated otherwise.",
+  indReason:"Mitochondrial energy, cellular repair, and metabolic/cognitive resilience.",
+  rules:[{when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"VIP",abbr:"vasoactive intestinal peptide",vol:"V03",k:"Neuropeptide",goals:["immune","tissue"],tier:"emg",
+  mech:"Anti-inflammatory neuropeptide and vasodilator \u2014 downregulates the CIRS cytokines TGF-\u03b21, C4a, and MMP-9 and restores low VEGF; the final repair step once the terrain is clear.",
+  dose:"Intranasal 50 mcg/spray, typically 4\u00d7 daily (reference). Give the first dose observed for tolerance. Sequence LAST in CIRS \u2014 only after MARCoNS cleared, VCS normal, lipase normal, and out of exposure.",
+  monitor:"Achievable in any clinic: confirm out of exposure, MARCoNS cleared, and a normal lipase before starting; give the first dose observed and follow clinical response. Recheck lipase (pancreatitis risk) \u2014 stop if abdominal pain with a rising lipase. Watch blood pressure (can drop). About the TGF-\u03b21 test: the classic Shoemaker check draws TGF-\u03b21 + C4a before and 15 min after the first dose to detect hidden ongoing exposure \u2014 but this is a specialized send-out lab, not a true in-office test, and most clinicians don\u2019t run the 15-minute version. It is NOT required to use VIP safely: confirming a clean environment accomplishes the same goal, so lack of rapid cytokine testing should not deter appropriate use.",
+  cautions:"Pancreatitis risk \u2014 the reason lipase is monitored; stop if abdominal pain with a rising lipase. Can flare histamine/mast cells. Ineffective and inappropriate if started before the terrain is clear.",
+  indReason:"Final-phase CIRS repair \u2014 corrects residual TGF-\u03b21 / C4a / MMP-9 / VEGF once the gates are passed.",
+  rules:[
+   {when:f=>f.pancr,level:"caution",reason:"VIP carries a pancreatitis risk \u2014 with a pancreatitis history, avoid or use extra caution with close lipase monitoring."},
+   {when:f=>f.immune==="overreactive",level:"caution",reason:"Confirm the terrain is ready \u2014 out of exposure, MARCoNS cleared, normal lipase \u2014 before use. (The 15-min TGF-\u03b21/C4a first-dose test is the classic Shoemaker check for hidden exposure, but it is a send-out lab and not required to proceed safely.)",alt:"Complete drainage, antimicrobial, and exposure-removal steps first."},
+   {when:f=>f.mcas,level:"caution",reason:"Can flare histamine/mast cells \u2014 start low and stabilize reactivity first.",alt:"Stabilize MCAS before introducing VIP."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"LL-37",vol:"V04",k:"Cathelicidin (human antimicrobial peptide)",goals:["immune","gut"],tier:"emg",
+  mech:"The sole human cathelicidin — broad-spectrum host-defense peptide: antibacterial (incl. MRSA and biofilms), antiviral against enveloped viruses (influenza, RSV, HIV, SARS-CoV-2 — direct viral-envelope disruption plus reduced pro-inflammatory cytokines), and antifungal (Candida, incl. drug-resistant strains) — it binds and permeabilizes the microbial membrane (pore formation → leakage) and triggers oxidative stress/cell-cycle arrest, and it disrupts biofilms. Immunomodulatory; the body\u2019s own production is upregulated by vitamin D.",
+  dose:"~100 mcg SC daily (reference range 60–200 mcg/day; max ~200 mcg); short 2–4 week targeted courses. Nebulized for sinus/pulmonary (biofilm or respiratory-viral) use.",
+  monitor:"Symptom response; watch for inflammatory flare in reactive patients. Optimize vitamin D (25-OH ~40–60 ng/mL) — it upregulates the body\u2019s own LL-37.",
+  cautions:"Two RCTs support topical LL-37 for venous-leg-ulcer wound healing; antiviral/antifungal actions are strong preclinical. Not FDA-approved. STAGING matters: because it breaks up biofilms, expect die-off (Herxheimer) and possible histamine flare — use only once the patient is ready (drainage open, binders on board, mast-cell/reactivity stabilized), NOT first-line in a fragile or highly reactive patient. Targeted, not chronic.",
+  indReason:"Biofilm/MARCoNS colonization and broad antimicrobial support — antibacterial, antiviral (enveloped viruses), and antifungal.",
+  rules:[
+   {when:f=>f.mcas,level:"caution",reason:"Can provoke reactive patients — start low and watch for flare.",alt:"Address mast-cell stability first."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Sermorelin",vol:"V05",k:"GH secretagogue",goals:["tissue","longevity","mito","muscle"],tier:"est",
+  mech:"GHRH analog \u2014 stimulates pulsatile, physiologic GH release; gentler than CJC-1295.",
+  dose:"200\u2013500 mcg SC nightly; requires a \u22652-hour fast before dosing.",
+  monitor:"IGF-1 (upper-half of age range, not above ULN); fasting glucose.",
+  cautions:"Raises IGF-1 \u2014 cancer screen; avoid under 30 with an intact axis. Formerly FDA-approved (Geref, discontinued); now compounded, with human data showing a GH/IGF-1 rise.",
+  indReason:"Physiologic GH-axis support for recovery, sleep, and body composition.",
+  rules:[
+   {when:f=>f.malig_active||f.malig_rem,level:"avoid",reason:"Raises IGF-1 \u2014 avoid with any cancer concern.",alt:"<b>GHK-Cu</b> or <b>MOTS-c</b> for tissue/longevity goals; coordinate oncology."},
+   {when:f=>f.u30,level:"caution",reason:"Generally avoid under 30 unless a documented GH deficiency."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy.",alt:"Defer GH-axis peptides."}]},
+
+ {n:"Survodutide",vol:"V06",k:"GLP-1/glucagon incretin (investigational)",goals:["metabolic"],tier:"emg",
+  mech:"Dual GLP-1/glucagon agonist \u2014 weight and metabolic/MASH effects. In Phase 3 trials, not yet FDA-approved.",
+  dose:"Personalized titration by response in small steps; up to ~4.8 mg SC weekly in trials (investigational).",
+  monitor:"Glucose, HbA1c, weight, GI tolerance.",
+  cautions:"Investigational; MTC/MEN2 screen.",
+  indReason:"Potent metabolic option \u2014 investigational.",
+  rules:[
+   {when:f=>f.pancr,level:"caution",reason:"History of pancreatitis \u2014 case-by-case, not an automatic no. Weigh the cause and course: a remote, resolved gallstone episode is very different from recurrent, idiopathic, or hypertriglyceridemic pancreatitis (the latter argue against a GLP-1). Trials excluded prior pancreatitis as a precaution; use judgment, and monitor.",alt:"If you\u2019d rather avoid the class: <b>Cagrilintide</b> (amylin analog) doesn\u2019t carry the pancreatitis signal; or <b>MOTS-c</b> (non-incretin)."},
+   {when:f=>f.retinopathy,level:"caution",reason:"Rapid glucose-lowering can transiently worsen diabetic retinopathy \u2014 titrate slowly and coordinate ophthalmology."},
+   {when:f=>f.mtc,level:"avoid",reason:"Screen out MTC/MEN2.",alt:"<b>MOTS-c</b>, or approved <b>tirzepatide</b> (still MTC-screened)."},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."},
+   {when:f=>true,level:"caution",reason:"Investigational \u2014 titrate by response."}]},
+
+ {n:"Cagrilintide",vol:"V06",k:"Amylin analog (investigational)",goals:["metabolic"],tier:"emg",
+  mech:"Long-acting amylin analog — promotes satiety and slows gastric emptying via amylin receptors (a different mechanism from GLP-1). It does NOT carry the GLP-1 class boxed warning for medullary thyroid carcinoma, and no pancreatitis signal appeared in trials.",
+  dose:"Up to 2.4 mg SC weekly in trials; effective alone or paired with a GLP-1 as CagriSema (investigational).",
+  monitor:"GI tolerance (nausea/vomiting), glucose, weight.",
+  cautions:"Investigational (not FDA-approved standalone). The MTC/MEN2 and pancreatitis cautions belong to the GLP-1 class — they apply only when it is combined with a GLP-1 (via that component), not to cagrilintide alone.",
+  indReason:"Satiety-driven weight loss — a useful option when a GLP-1 is a poor fit (pancreatitis history, MTC/MEN2), since the amylin mechanism doesn't carry those class warnings.",
+  rules:[
+   {when:f=>f.pancr,level:"caution",reason:"Amylin analog \u2014 doesn\u2019t carry the GLP-1 pancreatitis signal, so (unlike a GLP-1) it isn\u2019t excluded by pancreatitis history; a reasonable metabolic option (still investigational).",alt:""},
+   {when:f=>f.mtc,level:"caution",reason:"As an amylin analog, cagrilintide does NOT carry the GLP-1 MTC/MEN2 warning — so, unlike the GLP-1s, it is not contraindicated here and is a reasonable weight-loss option (unless combined with a GLP-1). Still investigational — coordinate and verify status.",alt:""},
+   {when:f=>f.preg,level:"avoid",reason:"Avoid in pregnancy."},
+   {when:f=>true,level:"caution",reason:"Investigational — titrate by response."}]},
+
+ {n:"OS-01 / ATX-304",vol:"V11",k:"Senotherapeutic peptide",goals:["skin","longevity"],tier:"mech",
+  mech:"Senolytic/senomorphic skin peptide \u2014 targets senescent-cell burden to improve skin quality and barrier.",
+  dose:"Topical only \u2014 apply 1\u20132\u00d7 daily; concentration is formulation-specific (proprietary low percentage in commercial products). No injectable dose.",
+  monitor:"Skin quality and barrier response.",
+  cautions:"Topical; well tolerated.",
+  indReason:"Skin senescence and skin-quality support.",
+  rules:[{when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Larazotide",vol:"V09",k:"Zonulin antagonist",goals:["gut"],tier:"emg",
+  mech:"Tight-junction regulator \u2014 antagonizes zonulin to restore intestinal barrier integrity (leaky gut, celiac).",
+  dose:"0.5 mg (500 mcg) oral three times daily before meals (reference).",
+  monitor:"GI and barrier-related symptoms; often paired with KPV / BPC-157.",
+  cautions:"Oral; well tolerated.",
+  indReason:"Barrier-failure gut conditions \u2014 first-line tight-junction repair.",
+  rules:[{when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Oxytocin",vol:"V08",k:"Neuropeptide",goals:["sexual"],tier:"emg",
+  mech:"Bonding and arousal neuropeptide \u2014 central sexual function; broader metabolic/bone/anti-fibrotic roles are more mechanistic.",
+  dose:"Intranasal or sublingual 10\u201340 IU (units) per dose as needed; some protocols up to ~80 IU (max). Use lowest effective.",
+  monitor:"Response; blood pressure.",
+  cautions:"Uterotonic \u2014 avoid in pregnancy. Broader systemic claims are mechanistic.",
+  indReason:"Central sexual-function and bonding support.",
+  rules:[
+   {when:f=>f.preg,level:"avoid",reason:"Uterotonic \u2014 avoid in pregnancy (stimulates uterine contraction).",alt:"Defer until postpartum."}]},
+
+ {n:"Dihexa",vol:"V08",k:"HGF/c-Met potentiator",goals:["cognition"],tier:"mech",
+  mech:"Potent synaptogenic peptide \u2014 amplifies HGF/c-Met signaling to build synapses; strong nootropic mechanism.",
+  dose:"Reference 8\u201320 mg oral or transdermal.",
+  monitor:"Cognitive response.",
+  cautions:"Acts on a growth pathway (HGF/c-Met) \u2014 reasonable to screen for active malignancy.",
+  indReason:"Potent synaptogenic support for cognition and neuro-recovery.",
+  rules:[
+   {when:f=>f.malig_active,level:"caution",reason:"Amplifies a growth (HGF/c-Met) pathway \u2014 screen active malignancy; coordinate.",alt:"<b>Semax</b> or <b>Selank</b> for gentler cognitive support."},
+   {when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"Humanin",vol:"V10",k:"Mitochondrial-derived peptide",goals:["longevity","mito","cognition"],tier:"mech",
+  mech:"Mitochondrial-derived peptide \u2014 cytoprotective, neuroprotective, and metabolically favorable; a longevity signal.",
+  dose:"Not standardized in humans; research/community protocols use low-milligram SC dosing (~2\u20135 mg SC 1\u20133\u00d7/week). Verify and individualize.",
+  monitor:"Response; well tolerated.",
+  cautions:"Limited pregnancy data.",
+  indReason:"Cytoprotective longevity and mitochondrial/neuro support.",
+  rules:[{when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+
+ {n:"AOD-9604",vol:"V05",k:"GH fragment (lipolytic)",goals:["metabolic"],tier:"emg",
+  mech:"GH fragment (176-191) \u2014 stimulates lipolysis without raising IGF-1 or affecting glucose; the fat-loss fragment.",
+  dose:"~300 mcg SC daily (reference).",
+  monitor:"Weight / body composition.",
+  cautions:"No IGF-1 effect \u2014 does not carry the GH-secretagogue cancer caution; well tolerated.",
+  indReason:"Targeted fat metabolism without GH/IGF-axis effects.",
+  rules:[{when:f=>f.preg,level:"caution",reason:"Insufficient pregnancy data."}]},
+ {n:"Amlexanox",vol:"V09",k:"Small molecule (NOT a peptide) — IKKε/TBK1 inhibitor",goals:["gut","metabolic","immune"],tier:"emg",
+  mech:"NOT a peptide — a small-molecule dual inhibitor of the non-canonical IκB kinases IKKε and TBK1 (master regulators of NF-κB / IRF inflammation); also a PDE4 inhibitor and mast-cell stabilizer. Often overlooked but genuinely useful — it dampens metabolic and mucosal inflammation at the kinase level.",
+  dose:"Topical (Aphthasol 5% oral paste) 4× daily to aphthous / oral-mucosal lesions — FDA-approved. Oral / systemic (off-label): the Phase 2 T2D/NAFLD RCT titrated 25 mg → 50 mg three times daily (~150 mg/day) and about one-third of patients responded (HbA1c ↓≥0.5%, improved insulin sensitivity and fatty liver; responders had higher baseline inflammation). That is the trial dose — practice/compounded dosing varies and is often lower; dose to the response you get, not to a fixed number.",
+  monitor:"Metabolic goal → HbA1c, fasting insulin, weight, hepatic markers (responders improve; higher baseline CRP predicts response). Gut / mucosal / mast-cell → symptom and inflammatory response. Aphthous → lesion healing.",
+  cautions:"Small molecule, not a peptide. Long, excellent safety record (in clinical use since the 1980s). Metabolic use is off-label/emerging (Phase 2 RCT — a responder subset benefits).",
+  indReason:"Overlooked broad anti-inflammatory — aphthous / oral ulcers (FDA-approved topical), gut / mucosal inflammation and mast-cell / allergic conditions (NF-κB and mast-cell stabilization), and metabolic (insulin resistance / NAFLD via IKKε/TBK1).",
+  rules:[
+   {when:f=>f.preg,level:"caution",reason:"Limited pregnancy data."}]},
+];
+
+function readFlags(){const id=x=>document.getElementById(x).value!==undefined?document.getElementById(x).value:null;
+  const c=x=>document.getElementById(x).checked;
+  return {goal:document.getElementById("goal").value, immune:document.getElementById("immune").value,
+    malig_active:c("malig_active"),malig_rem:c("malig_rem"),mcas:c("mcas"),preg:c("preg"),u30:c("u30"),
+    mtc:c("mtc"),copper:c("copper"),bipolar:c("bipolar"),cvd:c("cvd"),anticoag:c("anticoag"),pancr:c("pancr"),transplant:c("transplant"),retinopathy:c("retinopathy")};}
+
+function evalPeptide(p,f){
+  let level=p.goals.includes(f.goal)?"consider":"neutral", reasons=[], alt=null;
+  for(const r of p.rules){ if(r.when(f)){
+    if(LV[r.level]>LV[level]){level=r.level;reasons=[r.reason];alt=r.alt||null;}
+    else if(LV[r.level]===LV[level]){reasons.push(r.reason); if(r.alt&&!alt)alt=r.alt;}
+  }}
+  if(!p.goals.includes(f.goal) && LV[level]<LV.caution) return null;
+  if(p.goals.includes(f.goal)&&reasons.length===0) reasons=[p.indReason||"Indicated for this goal."];
+  return {...p,level,reasons,alt};
+}
+
+function card(it){
+  const [tlabel,tcls]=TIER[it.tier]||TIER.mech;
+  const abbr=it.abbr?` <span style="color:var(--muted);font-weight:600">(${it.abbr})</span>`:'';
+  const altHtml=(it.level!=='consider'&&it.alt)?`<div class="ialt">\u2192 <b>Where to go instead:</b> ${it.alt}</div>`:'';
+  return `<div class="item ${it.level}" onclick="this.classList.toggle('open')">
+    <div class="ihead">
+      <div><span class="iname">${it.n}</span>${abbr}<span class="ivol">${it.vol}</span><span class="iclass">${it.k}</span>
+        <div class="ireason">${it.reasons.join(' ')}</div>${altHtml}</div>
+      <div class="chev">details \u25be</div>
+    </div>
+    <div class="detail">
+      <div class="drow"><span class="dlab">Reference dosing</span><div class="dval dose">${it.dose}</div></div>
+      <div class="drow"><span class="dlab">Duration &amp; cycling</span><div class="dval">${CYCLE[it.n]||"Course length and cycling per clinical goal; reassess and break as appropriate."}</div></div>
+      <div class="drow"><span class="dlab">Mechanism</span><div class="dval">${it.mech}</div></div>
+      <div class="drow"><span class="dlab">Evidence tier</span><div class="dval"><span class="tier ${tcls}">${tlabel}</span></div></div>
+      <div class="drow"><span class="dlab">Monitoring</span><div class="dval">${it.monitor}</div></div>
+      <div class="drow"><span class="dlab">Cautions</span><div class="dval">${it.cautions}</div></div>
+      <div class="drow"><span class="dlab">References</span><div class="dval">${(PREFS[it.n]||[22]).map(n=>`<span class="refnum" onclick="event.stopPropagation();openRefs()">${n}</span>`).join(" ")}</div></div>
+    </div></div>`;
+}
+
+function run(){
+  const f=readFlags();
+  const goalLabel=document.querySelector('#goal option:checked').textContent;
+  const _signed=!!window.__ppSignedIn;
+  const _pvBanner=_signed?'':'<div class="adminnote" style="background:#EAF1F8;border-left:4px solid var(--navy);color:#274b8a;margin:0 0 12px;border-radius:8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:200px"><b>Preview.</b> The Mitochondrial / Fatigue goal is fully open — sign in with your library email to unlock all goals, patient factors, dosing &amp; references.</span><button onclick="ppGoSignin()" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 15px;font-weight:700;cursor:pointer;font-family:var(--sans)">Sign in</button> <a href="https://buy.stripe.com/aFa4gz65Q9Ry0s0a3SfIs02" style="background:var(--teal);color:#fff;padding:9px 15px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px">Get the library →</a></div>';
+  if(!_signed && f.goal!=="mito"){ document.getElementById("out").innerHTML=_pvBanner+'<div class="goalhdr">'+goalLabel+'</div><div style="background:#fff;border:1px dashed #c9b98a;border-radius:12px;padding:28px 22px;text-align:center;margin-top:6px"><div style="font-size:30px">🔒</div><div style="font-family:var(--serif);font-size:20px;color:var(--navy);font-weight:600;margin:6px 0 8px">This goal is part of the full tool</div><div style="color:var(--muted);font-size:14px;max-width:470px;margin:0 auto 16px">The <b>Mitochondrial / Fatigue</b> goal is open as a free preview. Sign in with your library email to unlock all goals, the patient-factor steering, dosing, cycling, and references.</div><button onclick="ppGoSignin()" style="background:var(--navy);color:#fff;border:none;border-radius:9px;padding:12px 22px;font-weight:700;cursor:pointer;font-family:var(--sans)">Sign in to unlock</button></div>'; return; }
+  const items=P.map(p=>evalPeptide(p,f)).filter(Boolean);
+  const groups={avoid:[],caution:[],consider:[]};
+  items.forEach(it=>groups[it.level]&&groups[it.level].push(it));
+  const _pri=GOALPRIORITY[f.goal]||[];
+  const _rank=n=>{const k=_pri.indexOf(n);return k<0?999:k;};
+  ['avoid','caution','consider'].forEach(k=>groups[k].sort((a,b)=>_rank(a.n)-_rank(b.n)));
+  const flagsOn=['malig_active','malig_rem','mcas','preg','u30','mtc','copper','bipolar','cvd','anticoag','pancr','transplant','retinopathy'].filter(x=>f[x]).length;
+  let html=_pvBanner+`<div class="goalhdr">${goalLabel}</div><div class="goalsub">Immune picture: ${document.querySelector('#immune option:checked').textContent} \u00b7 ${flagsOn} patient factor${flagsOn===1?'':'s'} applied \u00b7 sorted Consider \u2192 Caution \u2192 Avoid, and within each group by clinical priority \u2014 foundational / where-to-start first, then adjuncts \u00b7 tap any card for dosing &amp; detail</div>`;
+  if(GOALNOTE[f.goal]) html+=`<div class="adminnote" style="margin:2px 0 12px;border-radius:8px">${GOALNOTE[f.goal]}</div>`;
+  for(const [key,label,cls] of [["consider","Consider","g-consider"],["caution","Use with caution","g-caution"],["avoid","Avoid / flag","g-avoid"]]){
+    const arr=groups[key]; if(!arr.length) continue;
+    html+=`<div class="grp"><div class="grptitle ${cls}"><span class="dot"></span>${label} (${arr.length})</div>${arr.map(card).join('')}</div>`;
+  }
+  if(!items.length) html+=`<div class="empty">No peptides in this subset match that goal yet.</div>`;
+  document.getElementById("out").innerHTML=html;
+  document.querySelectorAll('.flag').forEach(l=>{l.classList.toggle('on',l.querySelector('input').checked);});
+  document.getElementById("foot").innerHTML=`Peptides, Practiced. decision-support tool \u00b7 ${P.length} peptides encoded \u00b7 dosing is library reference, verify &amp; individualize \u00b7 evidence tiered honestly (established / emerging / mechanistic) \u2014 nothing dismissed for lacking a Western RCT; European &amp; Russian clinical data counts. Educational for licensed clinicians; not medical or legal advice.`;
+}
+// glossary render
+document.getElementById("glist").innerHTML=Object.entries(GLOSSARY).map(([k,v])=>`<div class="grow"><b>${k}</b><span>${v}</span></div>`).join('');
+document.getElementById("rlist").innerHTML=REFS.map(r=>`<div class="grow"><b>${r.n}</b><span>${r.c}</span></div>`).join('');
+document.getElementById("refs").addEventListener('click',e=>{if(e.target.id==='refs')e.target.classList.remove('show');});
+document.getElementById("screen").addEventListener('click',e=>{if(e.target.id==='screen')e.target.classList.remove('show');});
+document.getElementById("gloss").addEventListener('click',e=>{if(e.target.id==='gloss')e.target.classList.remove('show');});
+run();
+</script>
+<script>
+function ppGoSignin(){ try{localStorage.setItem("pp_after_signin","/tool");}catch(e){} location.href="/"; }
+if(!window.__ppSignedIn){ var _g=document.getElementById("goal"); if(_g){_g.value="mito";} if(typeof run==="function") run(); }
+</script>
+</body>
+</html>
