@@ -27,6 +27,13 @@ function isMoldSale(o) {
   return tag === 'mold';
 }
 
+// True when an invoice belongs to a subscription. Older Stripe API versions put the id on
+// invoice.subscription; newer ones move it under invoice.parent. billing_reason covers both.
+function isSubscriptionInvoice(o) {
+  if (o.subscription || o.parent?.subscription_details?.subscription) return true;
+  return String(o.billing_reason || '').startsWith('subscription');
+}
+
 function verifyStripeSig(rawBody, sigHeader, secret, toleranceSec = 300) {
   if (!sigHeader) return false;
   const parts = Object.fromEntries(sigHeader.split(',').map((p) => p.split('=')));
@@ -83,6 +90,13 @@ export default async (req) => {
       }
       case 'invoice.paid':
       case 'invoice.payment_succeeded': {
+        // Every Peptides product (library, Builder add-on, Builder standalone) is a one-time
+        // purchase, granted above on checkout.session.completed. The only subscription on the
+        // shared Stripe account is Mold's yearly plan, so a subscription invoice here is always
+        // a Mold sale or renewal. Ignore it, or every Mold buyer would get the Peptides library.
+        // If a Peptides subscription is ever added, grant on its own product here instead.
+        if (isSubscriptionInvoice(o)) break;
+
         const email = o.customer_email || o.customer_details?.email;
         const until = o.lines?.data?.[0]?.period?.end || Math.floor(Date.now() / 1000) + ONE_YEAR;
         if (email) await setPaid(email, until, 'active');
