@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PhenoAge Calculator — Peptides, Practiced.</title>
+<style>
+  :root{ --navy:#1F3A5F; --navy2:#16293f; --teal:#2E7D8A; --amber:#BF8F00; --muted:#5a6b72;
+    --bg:#eef2f2; --card:#ffffff; --line:#dce5e5; --green:#2E6B3E; --red:#9C2A2A;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --serif:Georgia,'Times New Roman',serif; box-sizing:border-box; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);font-family:var(--sans);color:#1f2a2e;}
+  .nav{background:var(--navy2);display:flex;justify-content:center;gap:8px;padding:8px 10px;flex-wrap:wrap;}
+  .nav a,.nav span{font-size:13px;font-weight:700;padding:7px 15px;border-radius:8px;text-decoration:none;}
+  .nav a{background:rgba(255,255,255,.10);color:#cfe6e8;}
+  .nav .cur{background:var(--teal);color:#fff;}
+  .wrap{max-width:720px;margin:0 auto;padding:22px 16px 60px;}
+  header.hd{background:linear-gradient(135deg,var(--navy2),var(--teal));border-radius:16px;padding:26px 26px 22px;color:#fff;margin-bottom:18px;}
+  header.hd .k{color:#8fe3d3;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
+  header.hd h1{font-family:var(--serif);font-size:30px;font-weight:600;margin:8px 0 6px;}
+  header.hd p{color:#dbeef0;font-size:14.5px;margin:0;line-height:1.5;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 20px 8px;margin-bottom:16px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;}
+  @media(max-width:560px){.grid{grid-template-columns:1fr;}}
+  .fld label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+  .fld .u{color:var(--muted);font-weight:500;font-size:12px;}
+  .fld input{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:16px;font-family:var(--sans);}
+  .fld input:focus{outline:none;border-color:var(--teal);}
+  .fld .warn{color:var(--red);font-size:11.5px;margin-top:3px;display:none;}
+  .fld.bad input{border-color:var(--red);}
+  .fld.bad .warn{display:block;}
+  .btn{display:block;width:100%;background:var(--navy);color:#fff;border:none;border-radius:11px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--sans);margin-top:6px;}
+  .btn:hover{background:#17304f;}
+  .out{display:none;margin-top:4px;}
+  .result{background:linear-gradient(135deg,var(--navy),var(--teal));border-radius:14px;padding:26px 22px;text-align:center;color:#fff;}
+  .result .big{font-size:52px;font-weight:800;line-height:1;margin:4px 0;}
+  .result .lab{color:#cfe6e8;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  .gap{display:inline-block;margin-top:12px;padding:8px 18px;border-radius:20px;font-weight:800;font-size:16px;}
+  .gap.younger{background:#d9f2e2;color:#1b5e34;}
+  .gap.older{background:#fbe3e3;color:#8a2020;}
+  .gap.even{background:#eef1f1;color:#45535a;}
+  .interp{font-size:14px;color:#334;line-height:1.55;margin-top:14px;background:#f4f8f8;border-left:3px solid var(--teal);padding:12px 14px;border-radius:8px;}
+  .note{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:14px;}
+  .amber{background:#FBF3E0;border-left:3px solid var(--amber);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#5c4708;line-height:1.5;margin-top:14px;}
+  /* lock */
+  #lock{position:fixed;inset:0;z-index:9999;background:linear-gradient(150deg,#16293f,#1F3A5F 55%,#2E7D8A);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;}
+  #lock .box{max-width:520px;text-align:center;}
+  #lock h2{font-family:var(--serif);font-size:28px;font-weight:600;margin:10px 0 8px;}
+  #lock p{font-size:15px;color:#e7f1f3;line-height:1.55;margin-bottom:18px;}
+  #lock a.sign{display:inline-block;background:var(--amber);color:#1a1400;font-weight:800;font-size:16px;padding:14px 30px;border-radius:11px;text-decoration:none;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="nav">
+  <a href="/">📚 Peptide Library</a>
+  <a href="/tool">🧬 Decision Tool</a>
+  <span class="cur">📏 Bio-Age Calculator</span>
+</div>
+
+<div class="wrap">
+  <header class="hd">
+    <div class="k">Peptides, Practiced. · Longevity Tools</div>
+    <h1>PhenoAge Calculator</h1>
+    <p>Enter nine standard labs (as your Quest report shows them) plus age, and get a biological-age estimate from the published Levine 2018 PhenoAge equation. No methylation test required.</p>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="fld" id="f_age"><label>Chronological age <span class="u">(years)</span></label><input type="number" id="age" inputmode="decimal" placeholder="e.g. 52"><div class="warn">Enter an age 18–110.</div></div>
+      <div class="fld" id="f_albumin"><label>Albumin <span class="u">(g/dL)</span></label><input type="number" id="albumin" step="0.1" inputmode="decimal" placeholder="e.g. 4.5"><div class="warn">Expected ~2.5–6 g/dL.</div></div>
+      <div class="fld" id="f_creatinine"><label>Creatinine <span class="u">(mg/dL)</span></label><input type="number" id="creatinine" step="0.01" inputmode="decimal" placeholder="e.g. 0.9"><div class="warn">Expected ~0.3–6 mg/dL.</div></div>
+      <div class="fld" id="f_glucose"><label>Glucose <span class="u">(mg/dL)</span></label><input type="number" id="glucose" inputmode="decimal" placeholder="e.g. 90"><div class="warn">Expected ~50–500 mg/dL.</div></div>
+      <div class="fld" id="f_crp"><label>hs-CRP <span class="u">(mg/L)</span></label><input type="number" id="crp" step="0.01" inputmode="decimal" placeholder="e.g. 0.8"><div class="warn">Expected ~0–60 mg/L.</div></div>
+      <div class="fld" id="f_lymph"><label>Lymphocytes <span class="u">(%)</span></label><input type="number" id="lymph" step="0.1" inputmode="decimal" placeholder="e.g. 30"><div class="warn">Expected ~1–75 %.</div></div>
+      <div class="fld" id="f_mcv"><label>MCV <span class="u">(fL)</span></label><input type="number" id="mcv" step="0.1" inputmode="decimal" placeholder="e.g. 90"><div class="warn">Expected ~60–130 fL.</div></div>
+      <div class="fld" id="f_rdw"><label>RDW <span class="u">(%)</span></label><input type="number" id="rdw" step="0.1" inputmode="decimal" placeholder="e.g. 13"><div class="warn">Expected ~10–30 %.</div></div>
+      <div class="fld" id="f_alp"><label>Alkaline phosphatase <span class="u">(U/L)</span></label><input type="number" id="alp" inputmode="decimal" placeholder="e.g. 70"><div class="warn">Expected ~10–500 U/L.</div></div>
+      <div class="fld" id="f_wbc"><label>WBC <span class="u">(Thousand/µL)</span></label><input type="number" id="wbc" step="0.1" inputmode="decimal" placeholder="e.g. 5.5"><div class="warn">Expected ~1–50 K/µL.</div></div>
+    </div>
+    <button class="btn" onclick="run()">Calculate PhenoAge</button>
+  </div>
+
+  <div class="out" id="out">
+    <div class="result">
+      <div class="lab">Biological age (PhenoAge)</div>
+      <div class="big" id="phenoVal">—</div>
+      <div id="gapWrap"></div>
+    </div>
+    <div class="interp" id="interp"></div>
+    <div class="amber">
+      <b>Read it honestly.</b> PhenoAge is a population-level estimate of physiological aging derived from mortality data (Levine et al., 2018), not a precise age and not a diagnosis. Its value is as a <b>within-person trend</b> over time against an intervention, not a single headline number. Acute illness or inflammation (a high CRP or WBC on the day) will transiently raise it. Re-check on a stable, non-acute day.
+    </div>
+    <div class="note">Formula: Levine ME et al. "An epigenetic biomarker of aging for lifespan and healthspan." <i>Aging</i>. 2018;10(4):573–591. Calculated locally in your browser; no data leaves this page.</div>
+  </div>
+</div>
+
+<div id="lock" style="display:none;">
+  <div class="box">
+    <div style="font-size:40px;">🔒</div>
+    <h2>PhenoAge Calculator</h2>
+    <p>Part of your Peptides, Practiced. library. Sign in with the email you purchased with to open it — your access works on up to 2 devices.</p>
+    <a class="sign" id="signin" href="#">Sign in to open →</a>
+    <div style="margin-top:16px;font-size:13px;"><a href="/" style="color:#cfe6e8;text-decoration:underline;">← Back to the Peptide Library</a></div>
+  </div>
+</div>
+
+<script>
+/* ---- access gate: same email-login license as the library ---- */
+(function(){
+  function tokenValid(){
+    try{ var t=localStorage.getItem('pp_lic_token')||'';
+      if(!t||t.indexOf('.')<0) return false;
+      var p=JSON.parse(atob(t.split('.')[0].replace(/-/g,'+').replace(/_/g,'/')));
+      return !!(p&&p.exp&&(Date.now()/1000)<p.exp);
+    }catch(e){ return false; }
+  }
+  if(!tokenValid()){
+    var lk=document.getElementById('lock'); lk.style.display='flex';
+    var s=document.getElementById('signin');
+    s.addEventListener('click',function(e){ e.preventDefault(); try{localStorage.setItem('pp_after_signin','/calc');}catch(_){ } location.href='/'; });
+  }
+})();
+
+/* ---- validated PhenoAge (Levine 2018) ---- */
+function phenoAge(v){
+  var alb=v.albumin*10, creat=v.creatinine*88.42, glu=v.glucose*0.0554994;
+  var crp=Math.max(v.crp/10,0.01), lncrp=Math.log(crp);
+  var xb=-19.907 -0.0336*alb +0.0095*creat +0.1953*glu +0.0954*lncrp
+    -0.0120*v.lymph +0.0268*v.mcv +0.3306*v.rdw +0.00188*v.alp +0.0554*v.wbc +0.0804*v.age;
+  var g=0.0076927, t=120;
+  var mort=1-Math.exp(-Math.exp(xb)*(Math.exp(g*t)-1)/g);
+  return 141.50225 + Math.log(-0.00553*Math.log(1-mort))/0.090165;
+}
+var RANGES={age:[18,110],albumin:[2.5,6],creatinine:[0.3,6],glucose:[50,500],crp:[0,60],
+  lymph:[1,75],mcv:[60,130],rdw:[10,30],alp:[10,500],wbc:[1,50]};
+function run(){
+  var ids=['age','albumin','creatinine','glucose','crp','lymph','mcv','rdw','alp','wbc'];
+  var v={}, ok=true, missing=false;
+  ids.forEach(function(id){
+    var el=document.getElementById(id), fld=document.getElementById('f_'+id);
+    var raw=el.value.trim(), num=parseFloat(raw);
+    fld.classList.remove('bad');
+    if(raw===''||isNaN(num)){ missing=true; return; }
+    var r=RANGES[id];
+    if(num<r[0]||num>r[1]){ fld.classList.add('bad'); ok=false; }
+    v[id]=num;
+  });
+  if(missing){ alert('Please fill in all ten fields.'); return; }
+  if(!ok){ alert('One or more values look out of range — check the flagged field (likely a unit or typo).'); return; }
+  var pa=phenoAge(v);
+  var diff=pa - v.age;
+  document.getElementById('phenoVal').textContent=pa.toFixed(1)+' yrs';
+  var gw=document.getElementById('gapWrap'), cls, txt;
+  if(Math.abs(diff)<0.75){ cls='even'; txt='About the same as chronological age'; }
+  else if(diff<0){ cls='younger'; txt=Math.abs(diff).toFixed(1)+' years YOUNGER than chronological age'; }
+  else { cls='older'; txt=diff.toFixed(1)+' years OLDER than chronological age'; }
+  gw.innerHTML='<span class="gap '+cls+'">'+txt+'</span>';
+  var interp;
+  if(diff<=-3) interp='A PhenoAge meaningfully below chronological age suggests favorable physiologic aging on these markers. Trend it over time to see whether interventions hold or extend the gap.';
+  else if(diff<0) interp='PhenoAge is modestly below chronological age. A reasonable baseline — the goal is to widen this gap over cycles of care.';
+  else if(diff<3) interp='PhenoAge is close to chronological age. Look at which inputs are pulling it up (often glucose, CRP, RDW, or WBC) and target those.';
+  else interp='PhenoAge is above chronological age, which flags accelerated physiologic aging on these markers. Identify the biggest drivers (frequently glucose, hs-CRP, RDW, albumin) and re-check after addressing them — and rule out acute illness skewing CRP/WBC today.';
+  document.getElementById('interp').textContent=interp;
+  document.getElementById('out').style.display='block';
+  document.getElementById('out').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>
