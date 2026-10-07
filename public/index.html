@@ -170,8 +170,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
 
   @media(max-width:860px){
     .layout{grid-template-columns:1fr}
-    nav{position:static;max-height:none;border-right:none;border-bottom:1px solid var(--line);display:none}
-    nav.open{display:block}
+    nav{display:none}
+    nav.open{display:block;position:fixed;top:62px;left:0;right:0;bottom:0;z-index:60;background:#fff;border-right:none;border-bottom:none;max-height:calc(100vh - 62px);overflow-y:auto;padding:18px 16px 60px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
     main{padding:24px 20px 70px}
     article{padding:26px 22px}
     .hero h1{font-size:30px}
@@ -684,8 +684,13 @@ function renderSearch(q){
   const results = [];
   DATA.forEach(d=>{
     const low = (d.text||'').toLowerCase();
+    const termList = (d.terms||[]).map(x=>x.toLowerCase());
     let score = 0;
-    terms.forEach(t=>{ const m = low.split(t).length-1; score += m; });
+    terms.forEach(t=>{
+      const m = low.split(t).length-1; score += m;
+      // match the keyword index (finds peptides inside locked sections too)
+      termList.forEach(k=>{ if(k.includes(t)) score += 12; });
+    });
     if(d.title.toLowerCase().includes(q.toLowerCase())) score += 25;
     if(score>0){
       const idx = low.indexOf(terms[0]);
@@ -701,13 +706,15 @@ function renderSearch(q){
   });
   results.sort((a,b)=>b.score-a.score);
   let html = '<div class="sr-head" style="font-size:14px;color:var(--muted);margin-bottom:16px">'+results.length+' result'+(results.length!==1?'s':'')+' for “'+esc(q)+'”</div>';
-  if(!results.length){ html += '<p style="color:var(--muted)">No matches in the open preview. Sign in to search across the full library, or try a peptide name, condition, or clinical term.</p>'; }
+  if(!results.length){ html += '<p style="color:var(--muted)">No matches. Try a peptide name (e.g. Cardiogen, BPC-157), a condition (mold, weight loss), or a clinical term.</p>'; }
   results.forEach(r=>{
     const locked = !canView(r.d.code) && !isSnippet(r.d.code);
+    // which indexed term matched (for the hint line)
+    const hit = (r.d.terms||[]).find(k=> terms.some(t=> k.toLowerCase().includes(t)));
     if(locked){
       html += '<div class="sr" style="background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin-bottom:12px;cursor:pointer" onclick="showDoc(\''+r.d.code+'\')"><div style="font-size:11.5px;font-weight:700;color:var(--teal);text-transform:uppercase">'+r.d.code+' · '+({vol:'Teaching Volume',protocol:'Protocol',special:'Reference'}[r.d.kind])+' · 🔒 locked</div>'
         + '<div style="font-family:var(--serif);font-size:17px;color:var(--navy);margin:3px 0 5px">'+r.d.title+'</div>'
-        + '<div style="font-size:14px;color:#9aa4ae">Sign in to read this section.</div></div>';
+        + '<div style="font-size:14px;color:#4c5661">'+(hit?('Contains <b>'+esc(hit)+'</b>. '):'')+'Tap to open'+(canView(r.d.code)?'':' (sign in to read)')+'.</div></div>';
     } else {
       html += '<div class="sr" style="background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin-bottom:12px;cursor:pointer" onclick="showDoc(\''+r.d.code+'\')"><div style="font-size:11.5px;font-weight:700;color:var(--teal);text-transform:uppercase">'+r.d.code+' · '+({vol:'Teaching Volume',protocol:'Protocol',special:'Reference'}[r.d.kind])+'</div>'
         + '<div style="font-family:var(--serif);font-size:17px;color:var(--navy);margin:3px 0 5px">'+r.d.title+'</div>'
