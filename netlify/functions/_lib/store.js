@@ -23,6 +23,22 @@ const licenses = () => getStore('licenses');
 const codes = () => getStore('codes');
 const devices = () => getStore('devices');
 
+// Netlify Blobs reads are "eventual" by default: after a key is UPDATED, reads can keep
+// returning the OLD value for up to 60 seconds. For the one-time code and the 2-device
+// list that is wrong: a device that has just signed in could be told "This device is no
+// longer active" by the very next request (so the user is signed out again and has to sign
+// in twice), a re-sent code could be rejected as wrong, and two sign-ins close together
+// could each overwrite the other's device. These two stores are therefore always read with
+// strong consistency. If the runtime can't do strong reads, fall back to the old behaviour.
+async function readJSONStrong(store, key) {
+  try {
+    return await store.get(key, { type: 'json', consistency: 'strong' });
+  } catch (e) {
+    if (e && e.name === 'BlobsConsistencyError') return await store.get(key, { type: 'json' });
+    throw e;
+  }
+}
+
 // ---- licenses (written by Stripe webhook, read by request-code) ----
 export async function setPaid(email, paidThroughUnix, status = 'active') {
   email = norm(email);
@@ -45,7 +61,7 @@ export async function putCode(email, code, ttlSeconds = 600) {
   await codes().setJSON(norm(email), { hash: hashCode(code), exp: Math.floor(Date.now() / 1000) + ttlSeconds });
 }
 export async function checkCode(email, code) {
-  const rec = await codes().get(norm(email), { type: 'json' });
+  const rec = await readJSONStrong(codes(), norm(email));
   if (!rec) return false;
   if (Date.now() / 1000 > rec.exp) return false;
   const a = Buffer.from(rec.hash);
@@ -57,7 +73,7 @@ export async function clearCode(email) { await codes().delete(norm(email)); }
 // ---- device registry (2-device cap; oldest evicted on 3rd) ----
 export async function registerDevice(email, device, cap = 2) {
   email = norm(email);
-  let list = (await devices().get(email, { type: 'json' })) || [];
+  let list = (await readJSONStrong(devices(), email)) || [];
   list = list.filter((d) => d.device !== device);           // de-dupe same device
   list.push({ device, firstSeen: Math.floor(Date.now() / 1000) });
   list.sort((a, b) => a.firstSeen - b.firstSeen);
@@ -67,7 +83,7 @@ export async function registerDevice(email, device, cap = 2) {
   return { active: list, evicted };
 }
 export async function deviceAllowed(email, device) {
-  const list = (await devices().get(norm(email), { type: 'json' })) || [];
+  const list = (await readJSONStrong(devices(), norm(email))) || [];
   return list.some((d) => d.device === device);
 }
 
