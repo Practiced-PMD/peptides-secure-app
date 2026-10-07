@@ -1,0 +1,24 @@
+# Search and AI assistants are welcome on the public library pages.
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Google-Extended
+User-agent: CCBot
+User-agent: *
+Allow: /
+# Paid tools and member pages stay out of search and AI indexes.
+Disallow: /api/
+Disallow: /.netlify/
+Disallow: /builder
+Disallow: /tool
+Disallow: /calc
+Disallow: /download.html
+Disallow: /downloads/
+
+Sitemap: https://peptides.practiced.health/sitemap.xml
