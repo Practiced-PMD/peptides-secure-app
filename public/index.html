@@ -200,14 +200,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
 
   /* Static About / FAQ block under the library home */
   .maincol{min-width:0}
-  #pp-about{padding:0 40px 80px;max-width:900px}
+  #pp-about{padding:0 40px 80px;max-width:900px;margin-top:-50px}
   #pp-about[hidden]{display:none}
   #pp-about h2{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--navy);margin:0 0 10px}
   #faq{border-top:1px solid var(--line);padding-top:24px}
   #faq .faq-item{border-bottom:1px solid var(--line);padding:10px 0}
   #faq summary{cursor:pointer;font-weight:600;font-size:15px;color:var(--navy)}
   #faq .faq-item p{font-size:14.5px;color:var(--ink);margin:6px 0 2px;max-width:720px}
-  @media(max-width:860px){#pp-about{padding:0 20px 60px}}
+  .pp-quote{margin:8px 0 30px;padding:20px 24px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:12px}
+  .pp-quote blockquote p{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--navy);margin:0 0 10px}
+  .pp-quote figcaption{font-size:13.5px;font-weight:600;color:var(--muted)}
+  #author{margin-top:26px;padding:16px 20px;background:#f0ede6;border-radius:10px;font-size:13.5px;color:var(--muted)}
+  #author p{margin:2px 0}
+  #author .author-name{color:var(--navy);font-size:15px}
+  @media(max-width:860px){#pp-about{padding:0 20px 60px;margin-top:-40px}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -240,10 +246,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
   <!-- Static About/FAQ block: plain HTML so search and AI crawlers that do not run scripts can read it.
        Shown on the library home for signed-out visitors (see the pp-about toggle script at the end of the page). -->
   <div id="pp-about">
+  <figure class="pp-quote">
+    <h2>From a clinician using the library</h2>
+    <blockquote>
+      <p>The Peptides Practice Library has been a game changer for me and my practice. Peptides Practice: Beyond the Course is very appropriately named because it bridges the gap between learning about peptides and actually knowing how to use them in clinical practice.</p>
+      <p>For clinicians who have learned about peptides but are still asking, “How do I actually use these with my patients?”, this is the resource I wish I had from the beginning.</p>
+    </blockquote>
+    <figcaption>Dr. Tom Messinger, ND, RN</figcaption>
+  </figure>
 <section id="faq" class="faq" aria-labelledby="faq-title">
   <h2 id="faq-title">Frequently asked questions</h2>
     <details class="faq-item" open>
-      <summary>What is Peptides, Practiced.?</summary>
+      <summary>What is the Peptides, Practiced. library?</summary>
       <p>A peptide therapy reference library for licensed prescribers. It has 11 teaching volumes organized by peptide category, 5 condition protocols, and reference tools including a dose and indication reference, monitoring labs and a consent template. It runs in the browser and installs to your phone.</p>
     </details>
     <details class="faq-item">
@@ -274,6 +288,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
       <summary>How much does it cost, and can I preview it?</summary>
       <p>The full library is $1,497 as a one-time purchase, which includes one year of updates. Volume 1 (Mitochondrial) and the dose calculator are open to preview without an account.</p>
     </details>
+</section>
+<section id="author" class="author" aria-label="About the author">
+  <p class="author-name">Written by <b>Monika Rodriguez, MSN, ARNP, FNP-C</b></p>
+  <p class="author-creds">Family and functional medicine nurse practitioner · Certified in Peptide Therapy (A4M I and Advanced II) · Mold Literate Certified (Dr. Jill Crista)</p>
+  <p class="author-links"><a href="https://www.atxinfusionandwellness.com/" target="_blank" rel="noopener">About Monika</a> · <a href="https://www.practiced.health/" target="_blank" rel="noopener">All Practiced. clinical references</a></p>
 </section>
   </div>
   </div>
@@ -880,12 +899,95 @@ if('serviceWorker' in navigator){
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.practiced.health/#org",
+      "name": "Practiced",
+      "alternateName": "Practiced.",
+      "url": "https://www.practiced.health/",
+      "email": "support@practiced.health",
+      "founder": {
+        "@id": "https://www.practiced.health/#monika"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/practiced-health",
+        "https://pharmacopeiamd.com/",
+        "https://peptides.practiced.health/",
+        "https://mold.practiced.health/",
+        "https://www.atxinfusionandwellness.com/"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://www.practiced.health/#monika",
+      "name": "Monika Rodriguez",
+      "honorificSuffix": "MSN, ARNP, FNP-C",
+      "jobTitle": "Family and Functional Medicine Nurse Practitioner",
+      "url": "https://www.atxinfusionandwellness.com/",
+      "sameAs": [
+        "https://www.linkedin.com/in/monika-rodriguez-np-072075345"
+      ],
+      "hasCredential": [
+        {
+          "@type": "EducationalOccupationalCredential",
+          "credentialCategory": "certification",
+          "name": "Certified in Peptide Therapy, A4M Peptide Therapy I and Advanced II",
+          "recognizedBy": {
+            "@type": "Organization",
+            "name": "American Academy of Anti-Aging Medicine (A4M)"
+          }
+        },
+        {
+          "@type": "EducationalOccupationalCredential",
+          "credentialCategory": "certification",
+          "name": "Mold Literate Certified (Dr. Jill Crista's program)"
+        }
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://peptides.practiced.health/#app",
+      "name": "Peptides, Practiced.",
+      "alternateName": "Peptides Practiced",
+      "applicationCategory": "MedicalApplication",
+      "operatingSystem": "Web",
+      "url": "https://peptides.practiced.health/",
+      "image": "https://peptides.practiced.health/icon-512.png",
+      "description": "A peptide therapy reference library for licensed prescribers: 11 teaching volumes by peptide category, 5 condition protocols, a dose and indication reference, monitoring labs, a consent template and a peptide dose calculator.",
+      "audience": {
+        "@type": "MedicalAudience",
+        "audienceType": "Clinician"
+      },
+      "author": {
+        "@id": "https://www.practiced.health/#monika"
+      },
+      "publisher": {
+        "@id": "https://www.practiced.health/#org"
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Full Library (one-time purchase, includes one year of updates)",
+          "price": "1497",
+          "priceCurrency": "USD",
+          "url": "https://peptides.practiced.health/",
+          "availability": "https://schema.org/InStock"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "FAQPage",
   "@id": "https://peptides.practiced.health/#faq",
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is Peptides, Practiced.?",
+      "name": "What is the Peptides, Practiced. library?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "A peptide therapy reference library for licensed prescribers. It has 11 teaching volumes organized by peptide category, 5 condition protocols, and reference tools including a dose and indication reference, monitoring labs and a consent template. It runs in the browser and installs to your phone."
