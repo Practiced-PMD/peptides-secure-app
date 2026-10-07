@@ -519,7 +519,24 @@ function loadLockedSection(code){
   const main = document.getElementById('main');
   let cached = null;
   try{ cached = localStorage.getItem('pp_sec_'+code); }catch(e){}
-  if(cached){ renderArticle(code, cached, ''); return; }
+  if(cached){
+    renderArticle(code, cached, '');
+    // Show the saved copy instantly, then quietly check for a newer version of this section
+    // (content updates used to never reach a device that had already opened it). This check
+    // never signs anyone out: a 401/403 or a network error just leaves the saved copy on screen.
+    if(LIC.token()){
+      fetch('/api/get-content?section='+encodeURIComponent(code),{headers:{Authorization:'Bearer '+LIC.token()}})
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(j){
+          if(!j || typeof j.html!=='string' || j.html===cached) return;
+          try{ localStorage.setItem('pp_sec_'+code, j.html); }catch(e){}
+          const st = history.state;
+          if(st && st.view==='doc' && st.code===code){ const y=window.scrollY; renderArticle(code, j.html, ''); window.scrollTo(0,y); }
+        })
+        .catch(function(){});
+    }
+    return;
+  }
   main.innerHTML = navBar() + '<article><h1 class="doc">'+d.title+'</h1>'+docSub(d,'')
     + '<p style="color:var(--muted)">Loading this section securely…</p></article>';
   document.querySelector('nav').classList.remove('open');
