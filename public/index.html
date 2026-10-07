@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Peptides, Practiced. — Library</title>
+<title>Peptides, Practiced. — Peptide Dosing Protocols and Clinical Reference for Prescribers</title>
+<meta name="description" content="Peptide selection, dosing, cycling and monitoring for complex patients: 11 teaching volumes, condition chapters, a dose calculator and a consent template. Written by an A4M peptide-certified nurse practitioner. Preview Volume 1 free.">
+<link rel="canonical" href="https://peptides.practiced.health/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Practiced">
+<meta property="og:title" content="Peptides, Practiced. — Peptide Dosing Protocols and Clinical Reference for Prescribers">
+<meta property="og:description" content="Peptide selection, dosing, cycling and monitoring for complex patients: 11 teaching volumes, condition chapters, a dose calculator and a consent template. Written by an A4M peptide-certified nurse practitioner. Preview Volume 1 free.">
+<meta property="og:url" content="https://peptides.practiced.health/">
+<meta property="og:image" content="https://peptides.practiced.health/icon-512.png">
+<meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1F3A5F">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -188,6 +197,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
   #pwaInstall .pwaHint{color:#d7eff2;margin-top:2px}
   #pwaInstall button.pwaBtn{background:#fff;color:var(--teal);border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer}
   #pwaInstall button.pwaX{position:absolute;top:6px;right:10px;background:transparent;border:0;color:#d7eff2;font-size:18px;cursor:pointer;line-height:1}
+
+  /* Static About / FAQ block under the library home */
+  .maincol{min-width:0}
+  #pp-about{padding:0 40px 80px;max-width:900px}
+  #pp-about[hidden]{display:none}
+  #pp-about h2{font-family:var(--serif);font-weight:600;font-size:22px;color:var(--navy);margin:0 0 10px}
+  #faq{border-top:1px solid var(--line);padding-top:24px}
+  #faq .faq-item{border-bottom:1px solid var(--line);padding:10px 0}
+  #faq summary{cursor:pointer;font-weight:600;font-size:15px;color:var(--navy)}
+  #faq .faq-item p{font-size:14.5px;color:var(--ink);margin:6px 0 2px;max-width:720px}
+  @media(max-width:860px){#pp-about{padding:0 20px 60px}}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -215,7 +235,48 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
 
 <div class="layout">
   <nav id="nav"></nav>
-  <main id="main"></main>
+  <div class="maincol">
+  <main id="main"><div class="hero"><div class="kicker">Beyond the Course</div><h1>Peptide dosing protocols and clinical reference for prescribers</h1><p>The clinical peptide library, at your fingertips. Search dosing, protocols, indications, and clinical guidance across the full library — organized by peptide category, condition, and reference tool.</p></div></main>
+  <!-- Static About/FAQ block: plain HTML so search and AI crawlers that do not run scripts can read it.
+       Shown on the library home for signed-out visitors (see the pp-about toggle script at the end of the page). -->
+  <div id="pp-about">
+<section id="faq" class="faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">Frequently asked questions</h2>
+    <details class="faq-item" open>
+      <summary>What is Peptides, Practiced.?</summary>
+      <p>A peptide therapy reference library for licensed prescribers. It has 11 teaching volumes organized by peptide category, 5 condition protocols, and reference tools including a dose and indication reference, monitoring labs and a consent template. It runs in the browser and installs to your phone.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does it include peptide dosing protocols and cycling schedules?</summary>
+      <p>Yes. Most peptide entries open with a quick table of vial size, dose, route and cycle, then cover mechanism, indications, dosing rationale and timing, contraindications, drug interactions, monitoring, side effects, stacking and clinical pearls. Five condition protocols cover concussion and head injury, systemic anti-aging and longevity, mold and environmental illness, chronic viral reactivation, and gut rebuild.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does it cover BPC-157 dosing?</summary>
+      <p>Yes. BPC-157 is covered in Volume 3 (Anti-inflammatory and Mucosal) and cross-referenced from the Tissue Repair volume, the condition protocols and the dose and indication reference. Volume 3 opens with the full library.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Is there a peptide dose calculator?</summary>
+      <p>Yes. The dose calculator turns vial strength, bacteriostatic water volume and target dose into units on a U-100 insulin syringe, and shows the concentration and doses per vial. It is open in the preview, no account needed.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Is there a peptide consent form template?</summary>
+      <p>Yes. The library includes a peptide consent template you can adapt for your practice. State-specific intake, consent and documentation forms are a separate add-on, the Compliance-Ready Peptide Program.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does it explain how to prescribe peptides?</summary>
+      <p>Yes. A dedicated reference covers the regulatory, sourcing and prescribing landscape, and a monitoring reference gives practical lab guidance by peptide class. Apply it within your own license, scope of practice and clinical judgment.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Who wrote it? Is it an A4M peptide certification course?</summary>
+      <p>It was written by Monika Rodriguez, MSN, ARNP, FNP-C, a nurse practitioner certified in peptide therapy through A4M (Peptide Therapy I and Advanced II). It is an independent library, not an A4M course, built for clinicians who have finished peptide training and want a reference they can use with patients.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How much does it cost, and can I preview it?</summary>
+      <p>The full library is $1,497 as a one-time purchase, which includes one year of updates. Volume 1 (Mitochondrial) and the dose calculator are open to preview without an account.</p>
+    </details>
+</section>
+  </div>
+  </div>
 </div>
 
 <script src="library-data.js"></script>
@@ -425,8 +486,8 @@ function renderHome(){
   const nProt = DATA.filter(d=>d.kind==='protocol').length;
   const nSpec = DATA.filter(d=>d.kind==='special').length;
   let html = '<div class="hero"><div class="kicker">Beyond the Course</div>'
-    + '<h1>The clinical peptide library, at your fingertips.</h1>'
-    + '<p>Search dosing, protocols, indications, and clinical guidance across the full library — organized by peptide category, condition, and reference tool.</p>'
+    + '<h1>Peptide dosing protocols and clinical reference for prescribers</h1>'
+    + '<p>The clinical peptide library, at your fingertips. Search dosing, protocols, indications, and clinical guidance across the full library — organized by peptide category, condition, and reference tool.</p>'
     + '<div class="stats">'
     + '<div class="stat"><div class="n">'+nVol+'</div><div class="l">Teaching Volumes</div></div>'
     + '<div class="stat"><div class="n">'+nProt+'</div><div class="l">Condition Protocols</div></div>'
@@ -802,6 +863,92 @@ if('serviceWorker' in navigator){
     }, 1800);
   }
 })();
+</script>
+<script>
+/* pp-about toggle: show the static About/FAQ block only on the library home, and not to signed-in members. */
+(function(){
+  var about=document.getElementById("pp-about"), main=document.getElementById("main");
+  if(!about||!main) return;
+  function sync(){
+    var lic=false; try{ lic=(typeof isLicensed==="function") && isLicensed(); }catch(e){}
+    about.hidden = lic || !main.querySelector(".hero");
+  }
+  sync();
+  try{ new MutationObserver(sync).observe(main,{childList:true}); }catch(e){}
+})();
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": "https://peptides.practiced.health/#faq",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Peptides, Practiced.?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A peptide therapy reference library for licensed prescribers. It has 11 teaching volumes organized by peptide category, 5 condition protocols, and reference tools including a dose and indication reference, monitoring labs and a consent template. It runs in the browser and installs to your phone."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it include peptide dosing protocols and cycling schedules?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Most peptide entries open with a quick table of vial size, dose, route and cycle, then cover mechanism, indications, dosing rationale and timing, contraindications, drug interactions, monitoring, side effects, stacking and clinical pearls. Five condition protocols cover concussion and head injury, systemic anti-aging and longevity, mold and environmental illness, chronic viral reactivation, and gut rebuild."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it cover BPC-157 dosing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. BPC-157 is covered in Volume 3 (Anti-inflammatory and Mucosal) and cross-referenced from the Tissue Repair volume, the condition protocols and the dose and indication reference. Volume 3 opens with the full library."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a peptide dose calculator?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The dose calculator turns vial strength, bacteriostatic water volume and target dose into units on a U-100 insulin syringe, and shows the concentration and doses per vial. It is open in the preview, no account needed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a peptide consent form template?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The library includes a peptide consent template you can adapt for your practice. State-specific intake, consent and documentation forms are a separate add-on, the Compliance-Ready Peptide Program."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it explain how to prescribe peptides?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. A dedicated reference covers the regulatory, sourcing and prescribing landscape, and a monitoring reference gives practical lab guidance by peptide class. Apply it within your own license, scope of practice and clinical judgment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who wrote it? Is it an A4M peptide certification course?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It was written by Monika Rodriguez, MSN, ARNP, FNP-C, a nurse practitioner certified in peptide therapy through A4M (Peptide Therapy I and Advanced II). It is an independent library, not an A4M course, built for clinicians who have finished peptide training and want a reference they can use with patients."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost, and can I preview it?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The full library is $1,497 as a one-time purchase, which includes one year of updates. Volume 1 (Mitochondrial) and the dose calculator are open to preview without an account."
+      }
+    }
+  ]
+}
 </script>
 </body>
 </html>
