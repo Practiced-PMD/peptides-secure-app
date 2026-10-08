@@ -222,10 +222,10 @@ async function loadProgram(token){
 }
 function setOffer(kind, email){   // 'addon' (library member) or 'standalone'
   document.getElementById('lockPrice').textContent = (kind === 'addon') ? PRICE_ADDON : PRICE_STANDALONE;
-  // Members check out with their library email filled in, so the webhook can match it
-  // to their library purchase (the $397 price only unlocks for a library member).
+  // Members check out with their library email filled in and locked, so the webhook can
+  // match it to their library purchase (the $397 price only unlocks for a library member).
   document.getElementById('unlockBtn').href = (kind === 'addon')
-    ? UNLOCK_URL_ADDON + (email ? '&prefilled_email=' + encodeURIComponent(email) : '')
+    ? UNLOCK_URL_ADDON + (email ? '&locked_prefilled_email=' + encodeURIComponent(email) : '')
     : UNLOCK_URL_STANDALONE;
 }
 setOffer('standalone');   // default for a new visitor
