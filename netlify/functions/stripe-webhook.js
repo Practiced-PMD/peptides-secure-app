@@ -7,8 +7,8 @@
 // This webhook ignores those, so a Mold buyer is never enrolled in Peptides or sent
 // the Peptides welcome email.
 import crypto from 'node:crypto';
-import { setPaid, setBuilderEntitled, normEmail } from './_lib/store.js';
-import { sendWelcomeEmail } from './_lib/email.js';
+import { setPaid, setBuilderEntitled, setBuilderHeld, isPaidNow, normEmail } from './_lib/store.js';
+import { sendWelcomeEmail, sendOwnerNotice } from './_lib/email.js';
 
 export const config = { path: '/api/stripe-webhook' };
 
@@ -25,6 +25,21 @@ function isMoldSale(o) {
   if (o.payment_link && MOLD_LINK_IDS.has(o.payment_link)) return true;
   const tag = o.client_reference_id || o.metadata?.app;
   return tag === 'mold';
+}
+
+// The two Builder prices, in cents, BEFORE any discount code (Stripe's amount_subtotal).
+// The $397 member add-on is only for people who already own the library; $797 is for
+// everyone else. The price is checked as well as the link tag, so a Builder purchase with
+// the tag stripped off the link can't fall through to the library grant below.
+const BUILDER_ADDON_CENTS = 39700;
+const BUILDER_STANDALONE_CENTS = 79700;
+
+// 'addon', 'standalone', or null (not a Builder purchase).
+function builderKind(o) {
+  const ref = o.client_reference_id;
+  if (ref === 'builder-addon' || o.amount_subtotal === BUILDER_ADDON_CENTS) return 'addon';
+  if (ref === 'builder' || o.metadata?.product === 'builder' || o.amount_subtotal === BUILDER_STANDALONE_CENTS) return 'standalone';
+  return null;
 }
 
 // True when an invoice belongs to a subscription. Older Stripe API versions put the id on
@@ -67,11 +82,26 @@ export default async (req) => {
 
         const email = o.customer_details?.email || o.customer_email;
         if (email) {
-          // Builder purchase — flagged by either the payment link's metadata
-          // (metadata.product='builder') or its client_reference_id ('builder').
-          // Grants ONLY the Builder entitlement.
-          const isBuilder = o.metadata?.product === 'builder' || o.client_reference_id === 'builder';
-          if (isBuilder) {
+          // Builder purchase: grants ONLY the Builder entitlement. The $397 member price
+          // unlocks only for an email that owns the library; anyone else who pays it is held
+          // (not unlocked) and the owner is emailed to refund it or unlock it by hand.
+          const kind = builderKind(o);
+          if (kind === 'addon' && !(await isPaidNow(email))) {
+            await setBuilderHeld(email, 'addon_price_not_a_library_member', o.id);
+            try {
+              await sendOwnerNotice(
+                'Builder add-on paid by a non-member: not unlocked',
+                `${normEmail(email)} paid the $397 library-member price for the Compliance-Ready Program ` +
+                `(Stripe checkout ${o.id}), but that email does not own the Peptides, Practiced. library, ` +
+                `so the program was NOT unlocked.\n\n` +
+                `If they are a member under a different email, or you want to give them access anyway, add ` +
+                `this email to BUILDER_PAID_EMAILS in Netlify (site settings, Environment variables). ` +
+                `Otherwise refund the payment in Stripe, or have them pay the $797 price.`
+              );
+            } catch (mailErr) {
+              console.error('owner notice failed (non-fatal):', mailErr && mailErr.message);
+            }
+          } else if (kind) {
             await setBuilderEntitled(email);
           } else {
             // Library purchase (existing behavior, unchanged).

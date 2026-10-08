@@ -102,6 +102,13 @@ export async function setBuilderEntitled(email) {
   email = norm(email);
   await builder().setJSON(email, { email, entitled: true, since: Math.floor(Date.now() / 1000) });
 }
+// A Builder payment that must NOT unlock (the $397 member price paid by a non-member).
+// Kept on record for the owner; isBuilderEntitled() stays false. A later real grant
+// (setBuilderEntitled) simply overwrites it.
+export async function setBuilderHeld(email, reason, checkoutId) {
+  email = norm(email);
+  await builder().setJSON(email, { email, entitled: false, held: reason, checkout: checkoutId || null, since: Math.floor(Date.now() / 1000) });
+}
 export async function isBuilderEntitled(email) {
   if (BUILDER_PAID.has(norm(email))) return true;          // manual/comped grants
   const rec = await builder().get(norm(email), { type: 'json' });

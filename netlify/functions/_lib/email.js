@@ -6,6 +6,7 @@
 //   MAIL_FROM          "Peptides, Practiced. <access@practiced.health>"
 //   APP_NAME           "Peptides, Practiced."
 //   APP_URL            "https://peptides.practiced.health"  (link buyers click to open the app)
+//   OWNER_EMAIL        "support@practiced.health"  (optional; where owner notices go)
 //
 // Exports the SAME function name the rest of the kit imports (sendCodeEmail),
 // plus sendWelcomeEmail(email) used by the Stripe webhook post-payment.
@@ -59,6 +60,16 @@ async function sendViaSendGrid({ to, subject, text, html }) {
     throw new Error(`SendGrid failed (${res.status}): ${detail}`);
   }
   return true;
+}
+
+// A plain note to the app owner (OWNER_EMAIL, default support@practiced.health),
+// e.g. when a payment needs a human decision. Text only.
+export async function sendOwnerNotice(subject, text) {
+  const app = process.env.APP_NAME || 'Your App';
+  const to = process.env.OWNER_EMAIL || 'support@practiced.health';
+  const html = '<pre style="font-family:inherit;white-space:pre-wrap">' +
+    String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</pre>';
+  return sendViaSendGrid({ to, subject: `${app}: ${subject}`, text, html });
 }
 
 // The 6-digit sign-in code. Same signature the other functions import.
