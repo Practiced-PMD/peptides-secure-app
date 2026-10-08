@@ -145,6 +145,7 @@ $('dl').addEventListener('click', function(){
       if(!r.ok){
         if(r.status===401){ btn.disabled=false; btn.textContent='⬇ Download the library'; showSignIn(whoEmail()); throw new Error('Please verify your email below to unlock the download.'); }
         if(r.status===403){ btn.disabled=false; btn.textContent='⬇ Download the library'; showSignIn(whoEmail()); throw new Error('This device needs to be re-activated (you may be signed in on 2 other devices). Verify below to activate this one.'); }
+        if(r.status===402){ btn.disabled=false; btn.textContent='⬇ Download the library'; throw new Error('Your purchase is the Compliance-Ready Program. The Peptide Library is a separate purchase.'); }
         throw new Error('The download is unavailable right now (error ' + r.status + '). Please try again shortly.');
       }
       return r.blob();

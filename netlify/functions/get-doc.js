@@ -4,7 +4,7 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { verifyToken, bearer } from './_lib/token.js';
-import { deviceAllowed } from './_lib/store.js';
+import { deviceAllowed, isPaidNow } from './_lib/store.js';
 
 export const config = { path: '/api/get-doc' };
 
@@ -24,6 +24,10 @@ export default async (req) => {
   const claim = verifyToken(token);
   if (!claim) return deny('Not licensed. Please sign in.', 401);
   if (!(await deviceAllowed(claim.email, claim.device))) return deny('This device is no longer active on your license.', 403);
+
+  // Signed in, but bought only the Compliance-Ready Program. 402 (not 401/403), so the
+  // app shows this message instead of signing them out of the program too.
+  if (!(await isPaidNow(claim.email))) return deny('Your purchase is the Compliance-Ready Program. The Peptide Library is a separate purchase.', 402);
 
   const doc = id && DOCS[id];
   if (!doc) return deny('Unknown document.', 404);

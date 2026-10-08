@@ -20,7 +20,7 @@ export default async (req) => {
   // (Builder-only buyers never bought the library but must still be able to sign in.)
   if ((await isPaidNow(email)) || (await isBuilderEntitled(email))) {
     const code = String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
-    await putCode(email, code, 600);
+    await putCode(email, code, 1800); // 30 minutes, same as requestcode.js and the code email
     try { await sendCodeEmail(email, code); }
     catch (e) { return json({ ok: false, message: 'We could not send the email right now. Please try again shortly.' }, 502); }
   }

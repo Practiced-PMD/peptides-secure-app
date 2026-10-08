@@ -628,6 +628,11 @@ function loadLockedSection(code){
         // The server stores raw markdown for each section under `html`.
         try{ localStorage.setItem('pp_sec_'+code, res.j.html); }catch(e){}
         renderArticle(code, res.j.html, '');
+      } else if(res.status===402){
+        main.innerHTML = navBar()
+          + '<div class="locked"><div class="lk-icon">🔒</div><h2>'+d.title+'</h2>'
+          + '<p>'+((res.j&&res.j.message)||'The Peptide Library is a separate purchase.')+'</p>'
+          + '<a class="signin" href="https://buy.stripe.com/aFa4gz65Q9Ry0s0a3SfIs02">Get the library</a></div>';
       } else if(res.status===401 || res.status===403){
         LIC.clear(); syncLicArea();
         main.innerHTML = navBar()

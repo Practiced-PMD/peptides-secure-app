@@ -1,7 +1,7 @@
 // verify-code.js — user submits email + 6-digit code (+ a device id).
 // If valid, mint a license token good until their paid-through date, and
 // enforce the 2-device cap (a 3rd device evicts the oldest).
-import { checkCode, clearCode, getLicense, isPaidNow, registerDevice, normEmail } from './_lib/store.js';
+import { checkCode, clearCode, getLicense, isPaidNow, isBuilderEntitled, registerDevice, normEmail } from './_lib/store.js';
 import { mintToken, newDeviceId } from './_lib/token.js';
 
 export const config = { path: '/api/verify-code' };
@@ -15,7 +15,9 @@ export default async (req) => {
   code = String(code || '').trim();
   if (!email || !/^\d{6}$/.test(code)) return json({ ok: false, message: 'Enter your email and the 6-digit code.' }, 400);
 
-  if (!(await isPaidNow(email))) return json({ ok: false, message: "We couldn't find an active purchase for that email." }, 403);
+  // Library members, or Compliance-Ready Program buyers who never bought the library (the
+  // library endpoints check isPaidNow themselves, so their token only opens the program).
+  if (!(await isPaidNow(email)) && !(await isBuilderEntitled(email))) return json({ ok: false, message: "We couldn't find an active purchase for that email." }, 403);
   if (!(await checkCode(email, code))) return json({ ok: false, message: 'That code is wrong or expired. Request a new one.' }, 401);
 
   await clearCode(email); // one-time use
