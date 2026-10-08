@@ -27,7 +27,8 @@ function isMoldSale(o) {
   return tag === 'mold';
 }
 
-// The two Builder prices, in cents, BEFORE any discount code (Stripe's amount_subtotal).
+// The two Builder prices, in US cents, BEFORE any discount code (Stripe's amount_subtotal;
+// when Stripe charged in the buyer's local currency, the USD figure is in currency_conversion).
 // The $397 member add-on is only for people who already own the library; $797 is for
 // everyone else. The price is checked as well as the link tag, so a Builder purchase with
 // the tag stripped off the link can't fall through to the library grant below.
@@ -37,8 +38,9 @@ const BUILDER_STANDALONE_CENTS = 79700;
 // 'addon', 'standalone', or null (not a Builder purchase).
 function builderKind(o) {
   const ref = o.client_reference_id;
-  if (ref === 'builder-addon' || o.amount_subtotal === BUILDER_ADDON_CENTS) return 'addon';
-  if (ref === 'builder' || o.metadata?.product === 'builder' || o.amount_subtotal === BUILDER_STANDALONE_CENTS) return 'standalone';
+  const usd = o.currency_conversion?.amount_subtotal ?? o.amount_subtotal;
+  if (ref === 'builder-addon' || usd === BUILDER_ADDON_CENTS) return 'addon';
+  if (ref === 'builder' || o.metadata?.product === 'builder' || usd === BUILDER_STANDALONE_CENTS) return 'standalone';
   return null;
 }
 
