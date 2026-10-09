@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Peptides, Practiced. — Peptide Dosing Protocols and Clinical Reference for Prescribers</title>
-<meta name="description" content="Peptide selection, dosing, cycling and monitoring for complex patients: 11 teaching volumes, condition chapters, a dose calculator and a consent template. Written by an A4M peptide-certified nurse practitioner. Preview Volume 1 free.">
+<meta name="description" content="Peptide selection, dosing, cycling and monitoring for complex patients: 11 teaching volumes, condition chapters, a dose calculator and a consent template. Written by an A4M peptide-certified nurse practitioner. Volume 1 is open to preview.">
 <link rel="canonical" href="https://peptides.practiced.health/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Practiced">
 <meta property="og:title" content="Peptides, Practiced. — Peptide Dosing Protocols and Clinical Reference for Prescribers">
-<meta property="og:description" content="Peptide selection, dosing, cycling and monitoring for complex patients: 11 teaching volumes, condition chapters, a dose calculator and a consent template. Written by an A4M peptide-certified nurse practitioner. Preview Volume 1 free.">
+<meta property="og:description" content="Peptide selection, dosing, cycling and monitoring for complex patients: 11 teaching volumes, condition chapters, a dose calculator and a consent template. Written by an A4M peptide-certified nurse practitioner. Volume 1 is open to preview.">
 <meta property="og:url" content="https://peptides.practiced.health/">
 <meta property="og:image" content="https://peptides.practiced.health/icon-512.png">
 <meta name="twitter:card" content="summary">
@@ -466,7 +466,7 @@ function buildNav(active){
     html += '<div class="nav-group"><h3>'+g.label+'</h3>';
     items.forEach(d=>{
       let badge = '';
-      if(PREVIEW_CODES.includes(d.code)) badge = ' <span class="preview-badge">Free</span>';
+      if(PREVIEW_CODES.includes(d.code)) badge = ' <span class="preview-badge">Open</span>';
       else if(isSnippet(d.code)) badge = ' <span class="preview-badge">Preview</span>';
       else if(!canView(d.code)) badge = ' <span style="color:#b8a24d">🔒</span>';
       html += '<div class="nav-item'+(active===d.code?' active':'')+'" onclick="showDoc(\''+d.code+'\')"><span class="nav-code">'+d.code+'</span><span>'+d.title+badge+'</span></div>';
@@ -522,7 +522,7 @@ function renderHome(){
     html += '<div class="doc-h1">'+g.label+'</div><div class="cardgrid">';
     items.forEach(d=>{
       let badge = '';
-      if(PREVIEW_CODES.includes(d.code)) badge = '<span class="preview-badge">Free</span>';
+      if(PREVIEW_CODES.includes(d.code)) badge = '<span class="preview-badge">Open</span>';
       else if(isSnippet(d.code)) badge = '<span class="preview-badge">Preview</span>';
       else if(!canView(d.code)) badge = '<span class="lock-badge">🔒 Locked</span>';
       html += '<div class="lcard" onclick="showDoc(\''+d.code+'\')"><div class="code">'+d.code+' '+badge+'</div><div class="t">'+d.title+'</div></div>';
@@ -553,7 +553,7 @@ function renderDoc(code){
   buildNav(code);
   // Free preview volume — full text ships locally.
   if(PREVIEW_CODES.includes(code)){
-    renderArticle(code, d.text, isLicensed()?'':'<span class="preview-badge">Free preview</span>');
+    renderArticle(code, d.text, isLicensed()?'':'<span class="preview-badge">Preview</span>');
     return;
   }
   // Licensed → fetch the full locked body from the server.
@@ -588,7 +588,7 @@ function renderDoc(code){
     + '<p>This is part of the full library. Sign in with the email you purchased with to unlock all volumes, protocols, and references on this device.</p>'
     + '<button class="signin" onclick="showSignin(\''+code+'\')">Sign in to unlock</button>'
     + '<div style="margin-top:14px;font-size:13.5px;color:var(--muted)">New here? <a href="https://buy.stripe.com/aFa4gz65Q9Ry0s0a3SfIs02" style="color:var(--teal);font-weight:700;text-decoration:none">Get the full library &rarr;</a> then sign in with that email.</div>'
-    + '<p style="margin-top:18px;font-size:13px">Free preview available: <a href="#" onclick="showDoc(\'01\');return false;">Volume 1 — Mitochondrial</a> and the <a href="#" onclick="showCalc();return false;">Dose Calculator</a>.</p>'
+    + '<p style="margin-top:18px;font-size:13px">Open to preview: <a href="#" onclick="showDoc(\'01\');return false;">Volume 1 — Mitochondrial</a> and the <a href="#" onclick="showCalc();return false;">Dose Calculator</a>.</p>'
     + '</div>';
   window.scrollTo(0,0);
 }
